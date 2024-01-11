@@ -2,6 +2,7 @@ import express, { request, response } from "express";
 import { Users } from "../models/UsersModel.js";
 import mongoose from "mongoose";
 import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 
 const authRouter = express.Router();
 
@@ -24,7 +25,13 @@ authRouter.post("/", async (request, response) => {
       return response.status(401).json({ message: "invalid password" });
     }
 
-    return response.status(200).json({ message: "Login Successful" });
+    //user authenticated,generate JWT token.
+
+    const token = jwt.sign({ userId: user._id }, "your-key", {
+      expiresIn: "1h",
+    });
+
+    return response.status(200).json({ message: "Login Successful", token });
   } catch (error) {
     console.log(error);
     response.status(500).json({ message: "internal server error" });
