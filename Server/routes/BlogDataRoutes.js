@@ -34,12 +34,14 @@ router.post("/uploads", async (request, response) => {
     const newBlog = {
       title: request.body.title,
       content: request.body.content,
-      image: {
+    };
+    if (request.file) {
+      newBlog.image = {
         name: request.file.originalname, //originalname gives the name of the image file to db
         data: request.file.buffer, //converts the image to Binary.createFromBase64 and stores in db
         contentType: request.file.mimetype, //it save the filetype and extension
-      },
-    };
+      };
+    }
 
     const Fblog = await FoodBlog.create(newBlog);
     return response.status(201).send(Fblog);

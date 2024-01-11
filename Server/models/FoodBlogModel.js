@@ -22,6 +22,11 @@ const foodBlogSchema = mongoose.Schema(
         type: String,
       },
     },
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Users",
+      required: true,
+    },
   },
 
   {
