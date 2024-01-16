@@ -13,6 +13,9 @@ button newpost -> a pop up window-> -title
 -content
 -image
 
+//change from local storage to cookies so that token can be send to every api call.
+// also on server side make a middleware if cookies is present in api call request then validate token first and then resolve the user details from the token.
+
 backend end stuff:-
 -title
 -content
@@ -35,3 +38,7 @@ Troubles faced during server setup :-
     hence put operation was not working when sending the data using postman through form-data.
 5.  Form-data in postman sends binary data, hence multer path is crucial for it to accept
     throught Form-data.
+
+cookies,anti-pattern
+
+check zustand.

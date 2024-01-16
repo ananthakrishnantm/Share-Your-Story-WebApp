@@ -27,7 +27,7 @@ app.use(cors());
 app.use("/blog", foodRouter);
 
 //route for users
-app.use("/registration", userRouter);
+app.use("/signup", userRouter);
 
 //route for Login
 app.use("/login", authRouter);

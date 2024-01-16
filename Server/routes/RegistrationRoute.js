@@ -1,5 +1,5 @@
 import express from "express";
-import { Users } from "../models/UsersModel.js";
+import { User } from "../models/UsersModel.js";
 import mongoose from "mongoose";
 import bcrypt from "bcrypt";
 
@@ -13,7 +13,7 @@ userRouter.post("/", async (request, response) => {
     const hashedPassword = await bcrypt.hash(password, salt);
 
     //creating a new user with hashed password
-    await Users.create({
+    await User.create({
       username,
       email,
       password: hashedPassword,
