@@ -8,7 +8,6 @@ const foodBlogSchema = mongoose.Schema(
     },
     content: {
       type: String,
-      required: true,
     },
 
     image: {

@@ -55,7 +55,7 @@ const Home = () => {
           <button>New Blog</button>
         </Link>
         <Link to={`/user/$`}>
-          <button>New Blog</button>
+          <button>my Blog</button>
         </Link>
         <button onClick={handleLogout}>Logout</button>
       </div>

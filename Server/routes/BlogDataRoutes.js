@@ -31,7 +31,7 @@ router.use("/", authRouter);
 
 router.post("/uploads", upload.single("image"), async (request, response) => {
   try {
-    if (!request.body.title || !request.body.content) {
+    if (!request.body.title && (!request.body.content || !request.body.image)) {
       return response.status(400).send({
         message: "send all require fields:title,author,publishYear",
       });
@@ -76,7 +76,7 @@ router.get("/", async (request, response) => {
   }
 });
 //to fetch data from single user
-router.get("/user/:userId", async (request, response) => {
+router.get("/user/:userId/blogs", async (request, response) => {
   // const secretKey = process.env.JWT_SECRET_KEY;
   // const decodedToken = jwt.verify(request.body.user, secretKey);
   // console.log(decodedToken);
@@ -91,7 +91,7 @@ router.get("/user/:userId", async (request, response) => {
       return response.status(400).json({ message: "invalid id format" });
     }
 
-    const Fblog = await FoodBlog.findOne({ user: userId });
+    const Fblog = await FoodBlog.find({ user: userId });
 
     if (!Fblog) {
       console.log("blog not foud");

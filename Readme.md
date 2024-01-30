@@ -42,3 +42,9 @@ Troubles faced during server setup :-
 cookies,anti-pattern
 
 check zustand.
+
+could issues
+
+1. cors
+2. port-might be in different ports.
+3. cookies is not getting saved locally.
