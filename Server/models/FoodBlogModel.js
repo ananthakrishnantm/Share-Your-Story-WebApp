@@ -8,7 +8,6 @@ const foodBlogSchema = mongoose.Schema(
     },
     content: {
       type: String,
-      required: true,
     },
 
     image: {
@@ -24,7 +23,7 @@ const foodBlogSchema = mongoose.Schema(
     },
     user: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Users",
+      ref: "User",
       required: true,
     },
   },

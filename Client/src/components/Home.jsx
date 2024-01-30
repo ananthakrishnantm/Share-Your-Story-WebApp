@@ -1,19 +1,36 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Buffer } from "buffer";
+import { Link, useNavigate, useParams } from "react-router-dom";
 
 const Home = () => {
   const [blog, setBlog] = useState([]);
+  const [loggedIn, setLoggedIn] = useState(false);
+  const navigate = useNavigate();
 
+  const { id } = useParams();
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    navigate("/login");
+  };
   useEffect(() => {
-    axios
-      .get("http://localhost:3000/blog")
-      .then((response) => {
-        setBlog(response.data.data);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+    const token = localStorage.getItem("token");
+    if (token) {
+      setLoggedIn(true);
+      axios
+        .get("http://localhost:3000/blog")
+        .then((response) => {
+          setBlog(response.data.data);
+          console.log(token);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    } else {
+      console.log("ur not logged in");
+      navigate("/login");
+    }
   }, []);
 
   console.log(blog);
@@ -33,6 +50,15 @@ const Home = () => {
           <h2>{data.content}</h2>
         </div>
       ))}
+      <div>
+        <Link to={"/upload"}>
+          <button>New Blog</button>
+        </Link>
+        <Link to={`/user/$`}>
+          <button>my Blog</button>
+        </Link>
+        <button onClick={handleLogout}>Logout</button>
+      </div>
     </div>
   );
 };

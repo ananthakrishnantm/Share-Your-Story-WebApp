@@ -10,13 +10,19 @@ import cors from "cors";
 
 const app = express();
 
+const corsOptions = {
+  origin: "http://localhost:5173", // Replace with your actual frontend domain
+  credentials: true,
+};
+
+app.use(cors(corsOptions));
+
 // const storage = multer.memoryStorage();
 // const upload = multer({ storage: storage });
 
 // app.use("/", upload.single("image"));
 
 app.use(express.json());
-app.use(cors());
 
 // app.get("/", (req, res) => {
 //   console.log(req);
@@ -27,7 +33,7 @@ app.use(cors());
 app.use("/blog", foodRouter);
 
 //route for users
-app.use("/registration", userRouter);
+app.use("/signup", userRouter);
 
 //route for Login
 app.use("/login", authRouter);

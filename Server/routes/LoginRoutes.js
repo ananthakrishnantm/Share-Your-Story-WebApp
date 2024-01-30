@@ -1,8 +1,13 @@
 import express, { request, response } from "express";
-import { Users } from "../models/UsersModel.js";
+import { User } from "../models/UsersModel.js";
 import mongoose from "mongoose";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import dotenv from "dotenv";
+
+dotenv.config();
+
+const secretKey = process.env.JWT_SECRET_KEY;
 
 const authRouter = express.Router();
 
@@ -10,7 +15,7 @@ authRouter.post("/", async (request, response) => {
   const { email, password } = request.body;
 
   try {
-    const user = await Users.findOne({ email });
+    const user = await User.findOne({ email });
     console.log(user);
 
     if (!user) {
@@ -27,9 +32,7 @@ authRouter.post("/", async (request, response) => {
 
     //user authenticated,generate JWT token.
 
-    const token = jwt.sign({ userId: user._id }, "your-key", {
-      expiresIn: "1h",
-    });
+    const token = jwt.sign({ userId: user._id }, secretKey);
 
     return response.status(200).json({ message: "Login Successful", token });
   } catch (error) {
