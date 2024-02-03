@@ -7,6 +7,7 @@ import mongoose from "mongoose";
 import authRouter from "./LoginRoutes.js";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
+import decodedToken from "../middleware/DecodingMiddleware.js";
 
 //in order to use express router
 //import express, declare express router
@@ -24,6 +25,8 @@ const router = express.Router();
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
+router.use(decodedToken);
+
 router.use("/", authRouter);
 
 // router.use("/", upload.single("image")); //IMP STEP
@@ -37,10 +40,11 @@ router.post("/uploads", upload.single("image"), async (request, response) => {
       });
     }
 
-    const secretKey = process.env.JWT_SECRET_KEY;
-    const decodedToken = jwt.verify(request.body.user, secretKey);
-    console.log(decodedToken);
-    const userId = decodedToken.userId;
+    // const cookies = request.headers.cookie.split("cookie=")[1];
+    // const secretKey = process.env.JWT_SECRET_KEY;
+    // const decodedToken = jwt.verify(cookies, secretKey);
+    // console.log(decodedToken);
+    const userId = request.userId;
     const newBlog = {
       title: request.body.title,
       content: request.body.content,
@@ -63,7 +67,7 @@ router.post("/uploads", upload.single("image"), async (request, response) => {
     response.status(500).send(err);
   }
 });
-router.get("/", async (request, response) => {
+router.get("/", decodedToken, async (request, response) => {
   try {
     const Fblog = await FoodBlog.find({});
     return response.status(200).json({
@@ -77,24 +81,20 @@ router.get("/", async (request, response) => {
 });
 //to fetch data from single user
 router.get("/user/:userId/blogs", async (request, response) => {
-  // const secretKey = process.env.JWT_SECRET_KEY;
-  // const decodedToken = jwt.verify(request.body.user, secretKey);
-  // console.log(decodedToken);
-  // const userId = decodedToken.userId;
-
   try {
-    const { userId } = request.params;
-    console.log("Fetching blog by Id...");
+    const userId = request.userId;
+
+    // console.log("Type of userId:", userId);
 
     if (!mongoose.Types.ObjectId.isValid(userId)) {
       console.error("invalid object id format");
       return response.status(400).json({ message: "invalid id format" });
     }
-
+    //find and findOne can caus issue when mapping
     const Fblog = await FoodBlog.find({ user: userId });
 
     if (!Fblog) {
-      console.log("blog not foud");
+      console.log("blog not found");
       return response.status(404).json({ message: "BlogNotFound" });
     }
     return response.status(200).json(Fblog);
@@ -139,14 +139,44 @@ router.put("/user/:userId", async (request, response) => {
     response.status(500).json({ message: err.message });
   }
 });
+//Route to View a single Blog
+router.get("/user/:userId/blogs/:blogId", async (request, response) => {
+  try {
+    const userId = request.userId;
+    console.log(request);
+    console.log("Type of userId:", userId);
+    console.log("Type of blogId:", blogId);
+
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+      console.error("invalid object id format");
+      return response.status(400).json({ message: "invalid id format" });
+    }
+
+    const Fblog = await FoodBlog.findOne({ _id: blogId, user: userId });
+
+    if (!Fblog) {
+      console.log("blog not found");
+      return response.status(404).json({ message: "BlogNotFound" });
+    }
+    return response.status(200).json("This is the Blog", Fblog);
+  } catch (err) {
+    console.log(err);
+    response.status(500).send(err);
+  }
+});
+
 //Route to delete a book
 
-router.delete("/user/:userId", async (request, response) => {
+router.delete("/user/:userId/blogs/:blogId", async (request, response) => {
   try {
-    const { userId } = request.params;
-    const filter = { user: userId };
+    const { userId } = request.userId;
 
-    const result = await FoodBlog.deleteOne(filter);
+    const { blogId } = request.params;
+    const filter = { _id: blogId };
+
+    const result = await FoodBlog.updateOne(filter, {
+      $set: { deleted: true },
+    });
     if (result.deletedCount === 0) {
       return response.status(404).json({ message: "blog not found" });
     }

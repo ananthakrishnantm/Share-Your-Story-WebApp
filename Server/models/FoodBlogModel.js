@@ -2,6 +2,11 @@ import mongoose from "mongoose";
 
 const foodBlogSchema = mongoose.Schema(
   {
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
     title: {
       type: String,
       required: true,
@@ -21,10 +26,9 @@ const foodBlogSchema = mongoose.Schema(
         type: String,
       },
     },
-    user: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
-      required: true,
+    isDeleted: {
+      type: Boolean,
+      default: false,
     },
   },
 

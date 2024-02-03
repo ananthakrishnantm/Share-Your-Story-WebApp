@@ -1,66 +1,18 @@
-import React, { useEffect, useState } from "react";
-import axios from "axios";
-import { Buffer } from "buffer";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import React from "react";
+import Upload from "./Upload";
+import AllUserBlogs from "./AllUserBlogs";
+import Navbar from "./Navbar";
 
-const Home = () => {
-  const [blog, setBlog] = useState([]);
-  const [loggedIn, setLoggedIn] = useState(false);
-  const navigate = useNavigate();
-
-  const { id } = useParams();
-
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    navigate("/login");
-  };
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (token) {
-      setLoggedIn(true);
-      axios
-        .get("http://localhost:3000/blog")
-        .then((response) => {
-          setBlog(response.data.data);
-          console.log(token);
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    } else {
-      console.log("ur not logged in");
-      navigate("/login");
-    }
-  }, []);
-
-  console.log(blog);
+function Home() {
   return (
     <div>
-      {blog.map((data, index) => (
-        <div key={index}>
-          <h1>{data.title}</h1>
-          {data.image && (
-            <img
-              src={`data:${data.image.contentType};base64,${Buffer.from(
-                data.image.data.data
-              ).toString("base64")}`}
-              alt={blog.title}
-            />
-          )}
-          <h2>{data.content}</h2>
-        </div>
-      ))}
+      <Navbar />
       <div>
-        <Link to={"/upload"}>
-          <button>New Blog</button>
-        </Link>
-        <Link to={`/user/$`}>
-          <button>my Blog</button>
-        </Link>
-        <button onClick={handleLogout}>Logout</button>
+        <Upload />
+        <AllUserBlogs />
       </div>
     </div>
   );
-};
+}
 
 export default Home;

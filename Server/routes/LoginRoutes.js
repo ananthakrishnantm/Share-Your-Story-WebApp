@@ -33,6 +33,15 @@ authRouter.post("/", async (request, response) => {
     //user authenticated,generate JWT token.
 
     const token = jwt.sign({ userId: user._id }, secretKey);
+    console.log(token);
+
+    //cookie created here
+    response.cookie("cookie", token, {
+      httpOnly: true,
+      sameSite: "strict",
+      secure: true,
+      path: "/",
+    });
 
     return response.status(200).json({ message: "Login Successful", token });
   } catch (error) {

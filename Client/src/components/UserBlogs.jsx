@@ -3,7 +3,8 @@ import React, { useEffect, useState } from "react";
 import { Buffer } from "buffer";
 import "./userBlogs.css";
 
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import UserBlogView from "./UserBlogView";
 
 function jwtDecode(t) {
   let token = {};
@@ -16,40 +17,33 @@ function jwtDecode(t) {
 function UserBlogs() {
   const [userData, setUserData] = useState({});
   const [userBlogs, setUserBlogs] = useState([]);
-  const [loggedIn, setLoggedIn] = useState(false);
+
+  // const [loggedIn, setLoggedIn] = useState(false);
   const navigate = useNavigate();
+  const handleHome = () => {
+    navigate("/home");
+  };
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
+    try {
+      // Decode the token to get user information
+      // const decodedToken = jwtDecode(token);
+      // const userIdFromToken = decodedToken.payload.userId;
+      // setLoggedIn(true);
 
-    if (token) {
-      try {
-        // Decode the token to get user information
-        const decodedToken = jwtDecode(token);
-        const userIdFromToken = decodedToken.payload.userId;
-
-        setLoggedIn(true);
-
-        // Fetch user details and blogs together
-        axios
-          .get(`http://localhost:3000/blog/user/${userIdFromToken}/blogs`, {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          })
-          .then((response) => {
-            setUserBlogs(response.data);
-          })
-          .catch((err) => {
-            console.log(err);
-          });
-      } catch (error) {
-        console.log("Error decoding token:", error);
-        navigate("/login");
-      }
-    } else {
-      console.log("You are not logged in");
-      navigate("/login");
+      // Fetch user details and blogs together
+      axios
+        .get(`http://localhost:3000/blog/user/:userId/blogs`, {
+          withCredentials: true,
+        })
+        .then((response) => {
+          setUserBlogs(response.data);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    } catch (error) {
+      console.log("Error decoding token:", error);
     }
   }, [navigate]);
 
@@ -58,6 +52,9 @@ function UserBlogs() {
   return (
     <div>
       <h1>My Blogs</h1>
+
+      <button onClick={handleHome}>Home</button>
+
       {userBlogs.map((blog, index) => (
         <div className="card" key={index}>
           <h2>{blog.title}</h2>
@@ -71,6 +68,13 @@ function UserBlogs() {
               alt={blog.title}
             />
           )}
+          <div>
+            <Link to={`/home/userId/UsersBlog/${blog._id}`}>
+              <button>ViewBlog</button>
+            </Link>
+            <button>EditBlog</button>
+            <button>DeleteBlog</button>
+          </div>
         </div>
       ))}
     </div>
