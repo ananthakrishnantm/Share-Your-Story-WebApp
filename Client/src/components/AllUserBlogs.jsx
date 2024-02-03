@@ -16,18 +16,21 @@ const AllUserBlogs = () => {
     navigate("/login");
   };
   useEffect(() => {
-    axios
-      .get("http://localhost:3000/blog", { withCredentials: true })
-      .then((response) => {
+    const fetchData = async () => {
+      try {
+        const response = await axios.get("http://localhost:3000/blog", {
+          withCredentials: true,
+        });
+
         const sortedBlogs = response.data.data.sort(
           (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
         );
         setBlog(sortedBlogs);
-      })
-
-      .catch((err) => {
+      } catch (err) {
         console.log(err);
-      });
+      }
+    };
+    fetchData();
   }, []);
 
   const formatDate = (timeStamp) => {
