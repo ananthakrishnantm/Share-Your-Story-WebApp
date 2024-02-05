@@ -11,7 +11,9 @@ function UserBlogView() {
 
   useEffect(() => {
     axios
-      .get(``)
+      .get(`http://localhost:3000/user/:userId/blogs/${blogId}`, {
+        withCredentials: true,
+      })
       .then((response) => {
         setBlog(response.data);
       })
@@ -19,6 +21,8 @@ function UserBlogView() {
         console.log(err);
       });
   }, [blogId]);
+
+  console.log(blogId);
 
   return <div>Vewing The Blog</div>;
 }

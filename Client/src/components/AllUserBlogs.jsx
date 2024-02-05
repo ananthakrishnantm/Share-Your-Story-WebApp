@@ -47,10 +47,10 @@ const AllUserBlogs = () => {
   // console.log(blog);
   return (
     <div>
-      <div className="flex justify-center text-white ">
+      <div className="flex justify-center text-black ">
         <div>
           <Link to={`/home/userId`}>
-            <button>my Blog</button>
+            <button>My Blog</button>
           </Link>
         </div>
         |
