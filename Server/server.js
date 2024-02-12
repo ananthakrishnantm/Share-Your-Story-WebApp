@@ -6,6 +6,7 @@ import foodRouter from "../Server/routes/BlogDataRoutes.js";
 import userRouter from "./routes/RegistrationRoute.js";
 import authRouter from "./routes/LoginRoutes.js";
 import cors from "cors";
+import logoutMethod from "./routes/LogoutRoute.js";
 // import multer from "multer";
 
 const app = express();
@@ -30,6 +31,7 @@ app.use(express.json());
 // });
 
 //route for blog
+
 app.use("/blog", foodRouter);
 
 //route for users
@@ -37,6 +39,8 @@ app.use("/signup", userRouter);
 
 //route for Login
 app.use("/login", authRouter);
+
+app.use("/logout", logoutMethod);
 
 mongoose
   .connect(mongoDBURLS)

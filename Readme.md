@@ -29,5 +29,4 @@ check zustand.
 
 To-Do-list
 
-1. setting up tokens for authentication.
-2. alreaky a check is being done in the middleware, just check why it's not working.
+1.  age should be 18+ to register check with dob
