@@ -49,31 +49,55 @@ function UserBlogs() {
 
   console.log(userBlogs);
 
+  const formatDate = (timeStamp) => {
+    const options = {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      hour: "numeric",
+      minute: "numeric",
+    };
+    return new Date(timeStamp).toLocaleString("en-US", options);
+  };
+
   return (
     <div>
-      <h1>My Blogs</h1>
+      <div className=" flex mb-5 flex-col justify-center items-center">
+        <button onClick={handleHome}>Home</button>
 
-      <button onClick={handleHome}>Home</button>
+        <h1>My Blogs</h1>
+      </div>
 
       {userBlogs.map((blog, index) => (
-        <div className="card" key={index}>
-          <h2>{blog.title}</h2>
-          <h2>{blog.content}</h2>
-          {/*Always perfome the checks if to see if the item is present*/}
-          {blog.image && blog.image.contentType && (
-            <img
-              src={`data:${blog.image.contentType};base64,${Buffer.from(
-                blog.image.data.data
-              ).toString("base64")}`}
-              alt={blog.title}
-            />
-          )}
-          <div>
-            <Link to={`/home/userId/UsersBlog/${blog._id}`}>
-              <button>ViewBlog</button>
-            </Link>
-            <button>EditBlog</button>
-            <button>DeleteBlog</button>
+        <div className=" max-w-md mx-auto " key={index}>
+          <div className="bg-white rounded-sm overflow-hidden shadow-custom mb-2 hover:transform scale-105 transition-transform duration-300">
+            {/*Always perfome the checks if to see if the item is present*/}
+            {blog.image && blog.image.contentType && (
+              <img
+                className=" w-full h-32 object-cover objct-center"
+                src={`data:${blog.image.contentType};base64,${Buffer.from(
+                  blog.image.data.data
+                ).toString("base64")}`}
+                alt={blog.title}
+              />
+            )}
+            <div className="px-6 py-4">
+              <h1 className="font-bold text-base sm:text-lg md:text-xl lg:text-2xl xl:text-3xl mb-2">
+                {blog.title}
+              </h1>
+              <p className="text-black text-base sm:text-lg md:text-xl lg:text-2xl xl:text-3xl">
+                {blog.content}
+              </p>
+              <p className="text-gray-600 md:text-lg">
+                Created on:{formatDate(blog.createdAt)}
+              </p>
+            </div>
+            <div className="mb-5 px-6">
+              <Link to={`/home/userId/UsersBlog/${blog._id}`}>
+                <button>ViewBlog</button>|
+              </Link>
+              <button>EditBlog</button>|<button>DeleteBlog</button>
+            </div>
           </div>
         </div>
       ))}

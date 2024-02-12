@@ -25,7 +25,7 @@ const router = express.Router();
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
-router.use(decodedToken);
+router.use("/", decodedToken);
 
 router.use("/", authRouter);
 
@@ -39,11 +39,6 @@ router.post("/uploads", upload.single("image"), async (request, response) => {
         message: "send all require fields:title,author,publishYear",
       });
     }
-
-    // const cookies = request.headers.cookie.split("cookie=")[1];
-    // const secretKey = process.env.JWT_SECRET_KEY;
-    // const decodedToken = jwt.verify(cookies, secretKey);
-    // console.log(decodedToken);
     const userId = request.userId;
     const newBlog = {
       title: request.body.title,
@@ -143,7 +138,8 @@ router.put("/user/:userId", async (request, response) => {
 router.get("/user/:userId/blogs/:blogId", async (request, response) => {
   try {
     const userId = request.userId;
-    console.log(request);
+    const { blogId } = request.params;
+
     console.log("Type of userId:", userId);
     console.log("Type of blogId:", blogId);
 
@@ -152,13 +148,15 @@ router.get("/user/:userId/blogs/:blogId", async (request, response) => {
       return response.status(400).json({ message: "invalid id format" });
     }
 
-    const Fblog = await FoodBlog.findOne({ _id: blogId, user: userId });
+    const data = await FoodBlog.find({ _id: blogId, user: userId });
 
-    if (!Fblog) {
+    console.log(data);
+
+    if (!data) {
       console.log("blog not found");
       return response.status(404).json({ message: "BlogNotFound" });
     }
-    return response.status(200).json("This is the Blog", Fblog);
+    return response.status(200).json({ data });
   } catch (err) {
     console.log(err);
     response.status(500).send(err);

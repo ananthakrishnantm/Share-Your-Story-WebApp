@@ -1,29 +1,15 @@
-things to do:-
-[
+README :-
 
-front end stuff:-
+About :-
+This is a Blog webSite im developing locally right now.
 
-need a login page
-need a registration page
+The project has both client and server with user authentication mechanism.
 
-home-> title
--content
--image
-button newpost -> a pop up window-> -title
--content
--image
+MongoDb has been setup locally for this.
 
-//change from local storage to cookies so that token can be send to every api call.
-// also on server side make a middleware if cookies is present in api call request then validate token first and then resolve the user details from the token.
+How to Run :-
 
-backend end stuff:-
--title
--content
--image
--uselogin info
-
-]
-image ->user id to identify which user uploaded the image
+Use the command npm run dev to launch both the server and client.
 
 Troubles faced during server setup :-
 
@@ -39,12 +25,8 @@ Troubles faced during server setup :-
 5.  Form-data in postman sends binary data, hence multer path is crucial for it to accept
     throught Form-data.
 
-cookies,anti-pattern
-
 check zustand.
 
-could issues
+To-Do-list
 
-1. cors
-2. port-might be in different ports.
-3. cookies is not getting saved locally.
+1.  age should be 18+ to register check with dob

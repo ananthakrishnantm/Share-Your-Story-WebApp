@@ -29,6 +29,12 @@ const Upload = () => {
         withCredentials: true,
       })
       .then(() => {
+        //sends to globalstate
+        dispatch({
+          type: "SET_BLOG_DATA",
+          payload: { title, content, image },
+        });
+
         navigate("/home");
       })
       .catch((error) => {
