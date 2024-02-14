@@ -4,37 +4,31 @@ import { useNavigate } from "react-router-dom";
 import "./Upload.css";
 import { AiOutlineUpload } from "react-icons/ai";
 
-const Upload = () => {
+const Upload = ({ updateBlogList }) => {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [image, setImage] = useState(null);
-  const [user, SetUser] = useState("");
-  const [loggedIn, setLoggedIn] = useState(false);
-  const navigate = useNavigate();
 
-  // Fetch user ID from localStorage when the component mounts
-  // const userId = localStorage.getItem("userId");
+  // Access the dispatch function from the context
+
+  const navigate = useNavigate();
 
   const handleCreateBlog = () => {
     const formData = new FormData();
     formData.append("title", title);
     formData.append("content", content);
     formData.append("image", image);
-    // Include the user ID
-
-    // formData.append("user", token);
 
     axios
       .post("http://localhost:3000/blog/uploads/", formData, {
         withCredentials: true,
       })
-      .then(() => {
-        //sends to globalstate
-        dispatch({
-          type: "SET_BLOG_DATA",
-          payload: { title, content, image },
-        });
+      .then((response) => {
+        // Define response as a parameter
+        // After successful upload, dispatch an action to update the blog data
+        const blogArray = [response.data];
 
+        updateBlogList();
         navigate("/home");
       })
       .catch((error) => {

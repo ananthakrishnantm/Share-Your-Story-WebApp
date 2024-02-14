@@ -30,7 +30,10 @@ function UserBlogs(blogId) {
           withCredentials: true,
         })
         .then((response) => {
-          setUserBlogs(response.data);
+          const sortedBlogs = response.data.sort(
+            (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+          );
+          setUserBlogs(sortedBlogs);
         })
         .catch((err) => {
           console.log(err);

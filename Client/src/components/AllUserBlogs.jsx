@@ -6,7 +6,7 @@ import Upload from "./Upload";
 import "../components/AllUserBlogs.css";
 import UseAuth from "./GlobalStateMangement/UseAuthProvider";
 
-const AllUserBlogs = () => {
+const AllUserBlogs = ({ triggerFetch }) => {
   const [blog, setBlog] = useState([]);
   const navigate = useNavigate();
   const { id } = useParams();
@@ -16,6 +16,7 @@ const AllUserBlogs = () => {
     navigate("/login");
   };
   useEffect(() => {
+    console.log("triggerFetch value changed:", triggerFetch);
     const fetchData = async () => {
       try {
         const response = await axios.get("http://localhost:3000/blog", {
@@ -34,7 +35,7 @@ const AllUserBlogs = () => {
       }
     };
     fetchData();
-  }, []);
+  }, [triggerFetch]);
 
   const formatDate = (timeStamp) => {
     const options = {
