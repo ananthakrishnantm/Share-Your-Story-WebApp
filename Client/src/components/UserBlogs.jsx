@@ -4,17 +4,10 @@ import { Buffer } from "buffer";
 import "./userBlogs.css";
 
 import { Link, useNavigate } from "react-router-dom";
-import UserBlogView from "./UserBlogView";
+import UserBlogView from "./UserBlogOpearations/UserBlogView";
+import UserBlogDelete from "./UserBlogOpearations/UserBlogDelete";
 
-function jwtDecode(t) {
-  let token = {};
-  token.raw = t;
-  token.header = JSON.parse(window.atob(t.split(".")[0]));
-  token.payload = JSON.parse(window.atob(t.split(".")[1]));
-  return token;
-}
-
-function UserBlogs() {
+function UserBlogs(blogId) {
   const [userData, setUserData] = useState({});
   const [userBlogs, setUserBlogs] = useState([]);
 
@@ -37,7 +30,10 @@ function UserBlogs() {
           withCredentials: true,
         })
         .then((response) => {
-          setUserBlogs(response.data);
+          const sortedBlogs = response.data.sort(
+            (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+          );
+          setUserBlogs(sortedBlogs);
         })
         .catch((err) => {
           console.log(err);
@@ -93,10 +89,14 @@ function UserBlogs() {
               </p>
             </div>
             <div className="mb-5 px-6">
-              <Link to={`/home/userId/UsersBlog/${blog._id}`}>
+              <Link to={`/home/userId/View/${blog._id}`}>
                 <button>ViewBlog</button>|
               </Link>
-              <button>EditBlog</button>|<button>DeleteBlog</button>
+              <Link to={`/home/userId/Edit/${blog._id}`}>
+                <button>EditBlog</button>
+              </Link>
+              |
+              <UserBlogDelete blogId={blog._id} key={blog._id} />
             </div>
           </div>
         </div>

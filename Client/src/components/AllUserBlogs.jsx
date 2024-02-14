@@ -6,7 +6,7 @@ import Upload from "./Upload";
 import "../components/AllUserBlogs.css";
 import UseAuth from "./GlobalStateMangement/UseAuthProvider";
 
-const AllUserBlogs = () => {
+const AllUserBlogs = ({ triggerFetch }) => {
   const [blog, setBlog] = useState([]);
   const navigate = useNavigate();
   const { id } = useParams();
@@ -16,6 +16,7 @@ const AllUserBlogs = () => {
     navigate("/login");
   };
   useEffect(() => {
+    console.log("triggerFetch value changed:", triggerFetch);
     const fetchData = async () => {
       try {
         const response = await axios.get("http://localhost:3000/blog", {
@@ -34,7 +35,7 @@ const AllUserBlogs = () => {
       }
     };
     fetchData();
-  }, []);
+  }, [triggerFetch]);
 
   const formatDate = (timeStamp) => {
     const options = {
@@ -50,15 +51,17 @@ const AllUserBlogs = () => {
   // console.log(blog);
   return (
     <div>
-      <div className="flex justify-center text-black ">
+      <div className="flex justify-center text-black mb-5">
         <div>
           <Link to={`/home/userId`}>
-            <button>My Blog</button>
+            <button className="text-xl">My Blog</button>
           </Link>
         </div>
         |
         <div>
-          <button onClick={handleLogout}>Logout</button>
+          <button onClick={handleLogout} className="text-xl">
+            Logout
+          </button>
         </div>
       </div>
       {blog.map((data, index) => (

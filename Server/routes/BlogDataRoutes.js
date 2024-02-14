@@ -24,6 +24,7 @@ const router = express.Router();
 //FORM-DATA FROM POSTMAN WONT WORK IF MULTER NOT SET UP PROPERLY
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
+//use upload as in the html methode to update or add new files.
 
 router.use("/", decodedToken);
 
@@ -64,7 +65,9 @@ router.post("/uploads", upload.single("image"), async (request, response) => {
 });
 router.get("/", decodedToken, async (request, response) => {
   try {
-    const Fblog = await FoodBlog.find({});
+    const Fblog = await FoodBlog.find({
+      isDeleted: false,
+    });
     return response.status(200).json({
       count: FoodBlog.length,
       data: Fblog,
@@ -86,7 +89,10 @@ router.get("/user/:userId/blogs", async (request, response) => {
       return response.status(400).json({ message: "invalid id format" });
     }
     //find and findOne can caus issue when mapping
-    const Fblog = await FoodBlog.find({ user: userId });
+    const Fblog = await FoodBlog.find({
+      user: userId,
+      isDeleted: false,
+    });
 
     if (!Fblog) {
       console.log("blog not found");
@@ -100,40 +106,46 @@ router.get("/user/:userId/blogs", async (request, response) => {
 });
 
 //Route to update one file
+router.put(
+  "/user/:userId/blogs/:blogId",
+  upload.single("image"),
+  async (request, response) => {
+    try {
+      const userId = request.userId;
+      const { blogId } = request.params;
 
-router.put("/user/:userId", async (request, response) => {
-  try {
-    const { userId } = request.params;
+      console.log(userId);
+      console.log(blogId);
 
-    const updatedData = {
-      title: request.body.title,
-      content: request.body.content,
-    };
-    console.log(updatedData);
-    if (request.file) {
-      updatedData.image = {
-        name: request.file.originalname, //originalname gives the name of the image file to db
-        data: request.file.buffer, //converts the image to Binary.createFromBase64 and stores in db
-        contentType: request.file.mimetype, //it save the filetype and extension
+      const updatedData = {
+        title: request.body.title,
+        content: request.body.content,
       };
+      console.log(updatedData);
+      if (request.file) {
+        updatedData.image = {
+          name: request.file.originalname, //originalname gives the name of the image file to db
+          data: request.file.buffer, //converts the image to Binary.createFromBase64 and stores in db
+          contentType: request.file.mimetype, //it save the filetype and extension
+        };
+      }
+
+      const filter = { user: userId, _id: blogId };
+      const updatedBlog = await FoodBlog.updateOne(filter, updatedData, {
+        new: true,
+      });
+
+      if (!updatedBlog) {
+        return response.status(404).json({ message: "blog not updated" });
+      }
+      console.log(updatedBlog);
+      return response.status(200).json(updatedBlog);
+    } catch (err) {
+      console.log(error.message);
+      response.status(500).json({ message: err.message });
     }
-
-    const filter = { user: userId };
-
-    const updatedBlog = await FoodBlog.updateOne(filter, updatedData, {
-      new: true,
-    });
-
-    if (!updatedBlog) {
-      return response.status(404).json({ message: "blog not updated" });
-    }
-    console.log(updatedBlog);
-    return response.status(200).json(updatedBlog);
-  } catch (err) {
-    console.log(error.message);
-    response.status(500).json({ message: err.message });
   }
-});
+);
 //Route to View a single Blog
 router.get("/user/:userId/blogs/:blogId", async (request, response) => {
   try {
@@ -148,7 +160,11 @@ router.get("/user/:userId/blogs/:blogId", async (request, response) => {
       return response.status(400).json({ message: "invalid id format" });
     }
 
-    const data = await FoodBlog.find({ _id: blogId, user: userId });
+    const data = await FoodBlog.find({
+      _id: blogId,
+      user: userId,
+      isDeleted: false,
+    });
 
     console.log(data);
 
@@ -168,20 +184,21 @@ router.get("/user/:userId/blogs/:blogId", async (request, response) => {
 router.delete("/user/:userId/blogs/:blogId", async (request, response) => {
   try {
     const { userId } = request.userId;
-
     const { blogId } = request.params;
-    const filter = { _id: blogId };
 
+    const filter = { _id: blogId };
     const result = await FoodBlog.updateOne(filter, {
-      $set: { deleted: true },
+      $set: { isDeleted: true },
     });
     if (result.deletedCount === 0) {
-      return response.status(404).json({ message: "blog not found" });
+      return response
+        .status(404)
+        .json({ message: "Blog not found or already deleted" });
     }
-    return response.status(200).json({ message: "blog deleted successfully" });
+    return response.status(200).json({ message: "Blog deleted successfully" });
   } catch (err) {
     console.log(err.message);
-    response.status(500).json({ message: err.message });
+    response.status(500).json({ message: "Internal server error" });
   }
 });
 
