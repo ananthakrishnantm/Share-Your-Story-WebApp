@@ -1,5 +1,6 @@
 {
   "dependencies": {
-    "cookie": "^0.6.0"
+    "cookie": "^0.6.0",
+    "react-markdown": "^9.0.1"
   }
 }

@@ -50,15 +50,17 @@ const AllUserBlogs = () => {
   // console.log(blog);
   return (
     <div>
-      <div className="flex justify-center text-black ">
+      <div className="flex justify-center text-black mb-5">
         <div>
           <Link to={`/home/userId`}>
-            <button>My Blog</button>
+            <button className="text-xl">My Blog</button>
           </Link>
         </div>
         |
         <div>
-          <button onClick={handleLogout}>Logout</button>
+          <button onClick={handleLogout} className="text-xl">
+            Logout
+          </button>
         </div>
       </div>
       {blog.map((data, index) => (
