@@ -3,10 +3,12 @@ import { PORT, mongoDBURLS } from "./config.js";
 import mongoose, { mongo } from "mongoose";
 import { FoodBlog } from "./models/FoodBlogModel.js";
 import foodRouter from "../Server/routes/BlogDataRoutes.js";
-import userRouter from "./routes/RegistrationRoute.js";
+import registerRouter from "./routes/RegistrationRoute.js";
 import authRouter from "./routes/LoginRoutes.js";
 import cors from "cors";
 import logoutMethod from "./routes/LogoutRoute.js";
+import user from "./routes/UserDataRoutes.js";
+import followerRoute from "./routes/FollowersData.js";
 // import multer from "multer";
 
 const app = express();
@@ -30,18 +32,20 @@ app.use(express.json());
 //   return response.status(234).send("its successful");
 // });
 
+app.use("/profile", user);
 //route for blog
 
 app.use("/blog", foodRouter);
 
 //route for users
-app.use("/signup", userRouter);
+app.use("/signup", registerRouter);
 
 //route for Login
 app.use("/login", authRouter);
 
 app.use("/logout", logoutMethod);
 
+app.use("/follower", followerRoute);
 mongoose
   .connect(mongoDBURLS)
   .then(() => {

@@ -3,6 +3,7 @@ import React, { useState, useEffect, useReducer } from "react";
 import { useNavigate } from "react-router-dom";
 import "./Upload.css";
 import { AiOutlineUpload } from "react-icons/ai";
+import MDEditor from "@uiw/react-md-editor";
 
 const Upload = ({ updateBlogList }) => {
   const [title, setTitle] = useState("");
@@ -41,7 +42,7 @@ const Upload = ({ updateBlogList }) => {
   };
 
   return (
-    <div className="bg-white rounded-lg max-w-md mx-auto mb-4 overflow-hidden shadow-custom px-6 py-4">
+    <div className="bg-white rounded-md max-w-3xl mx-auto mb-4 overflow-hidden shadow-custom px-6 py-4">
       <h1 className="font-bold  text-base sm:text-lg md:text-xl lg:text-2xl xl:text-3xl mb-2 text-black">
         Create New Blog
       </h1>
@@ -53,10 +54,9 @@ const Upload = ({ updateBlogList }) => {
           onChange={(e) => setTitle(e.target.value)}
           className="w-full p-2 mb-2 border rounded-md upload-input-fields"
         />
-        <textarea
-          placeholder="Write your blog here..."
+        <MDEditor
           value={content}
-          onChange={(e) => setContent(e.target.value)}
+          onChange={setContent}
           className="w-full p-2 border rounded-md upload-input-fields"
         />
       </div>

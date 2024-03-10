@@ -9,10 +9,10 @@ import dotenv from "dotenv";
 dotenv.config();
 const secretKey = process.env.JWT_SECRET_KEY;
 
-const userRouter = express.Router();
+const registerRouter = express.Router();
 // userRouter.use("/", authRouter);
 
-userRouter.post("/", async (request, response) => {
+registerRouter.post("/", async (request, response) => {
   const {
     firstName,
     middleName,
@@ -58,4 +58,4 @@ userRouter.post("/", async (request, response) => {
   }
 });
 
-export default userRouter;
+export default registerRouter;

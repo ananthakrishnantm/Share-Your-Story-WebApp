@@ -4,6 +4,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { Buffer } from "buffer";
 
 import { AiOutlineUpload } from "react-icons/ai";
+import MDEditor from "@uiw/react-md-editor";
 
 const UserBlogEdit = () => {
   const [title, setTitle] = useState("");
@@ -53,10 +54,9 @@ const UserBlogEdit = () => {
           onChange={(e) => setTitle(e.target.value)}
           className="w-full p-2 mb-2 border rounded-md upload-input-fields"
         />
-        <textarea
-          placeholder="Edit your blog here..."
+        <MDEditor
           value={content}
-          onChange={(e) => setContent(e.target.value)}
+          onChange={setContent}
           className="w-full p-2 border rounded-md upload-input-fields"
         />
       </div>

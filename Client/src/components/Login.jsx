@@ -1,6 +1,6 @@
 import axios from "axios";
 import React, { useState } from "react";
-import { Navigate, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import "./login.css";
 
 const Login = ({ setToken }) => {
@@ -28,48 +28,54 @@ const Login = ({ setToken }) => {
   };
 
   return (
-    <div>
-      {
-        <>
-          <div className="flex items-center justify-center h-screen">
-            <div className="bg-white rounded-lg p-8 shadow-md">
-              <h1 className="text-2xl font-bold mb-5">Login</h1>
+    <div className="flex items-center justify-center h-screen">
+      <div className="bg-white rounded-lg p-8 shadow-md w-96">
+        <h1 className="text-4xl font-bold mb-8 text-center">Login</h1>
 
-              <div className="mb-5">
-                <label className="block text-sm font-medium text-gray-600">
-                  Email :
-                </label>
-                <input
-                  className="login-input-fields rounded-sm"
-                  type="text"
-                  name="email"
-                  onChange={(e) => setEmail(e.target.value)}
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-600">
-                  Password :
-                </label>
-                <input
-                  className="login-input-fields rounded-sm"
-                  type="password"
-                  name="password"
-                  onChange={(e) => setPassword(e.target.value)}
-                />
-              </div>
-              <div>
-                <button
-                  className="bg-gray-700 text-white px-4 py-2 rounded-md hover:bg-gray-900 focus:outline-none focus:ring  mt-5"
-                  onClick={handleLogin}
-                >
-                  Login
-                </button>
-              </div>
-              {/* <button onClick={handleSignUp}>SignUp</button> */}
-            </div>
-          </div>
-        </>
-      }
+        <div className="mb-8">
+          <label className="block text-lg font-medium text-gray-600">
+            Email :
+          </label>
+          <input
+            className="login-input-fields rounded-md w-full py-2 px-4 text-lg"
+            type="text"
+            name="email"
+            onChange={(e) => setEmail(e.target.value)}
+          />
+        </div>
+        <div className="mb-8">
+          <label className="block text-lg font-medium text-gray-600">
+            Password :
+          </label>
+          <input
+            className="login-input-fields rounded-md w-full py-2 px-4 text-lg"
+            type="password"
+            name="password"
+            onChange={(e) => setPassword(e.target.value)}
+          />
+        </div>
+        <div className="flex justify-between items-center mb-8">
+          <button
+            className="bg-blue-500 text-white px-6 py-3 rounded-md hover:bg-blue-700 focus:outline-none focus:ring text-lg"
+            onClick={handleLogin}
+          >
+            Login
+          </button>
+          <span className="text-blue-700 text-lg">
+            <Link to="/forgot-password">Forgot Password?</Link>
+          </span>
+        </div>
+        <div className="text-center">
+          <span className="text-gray-600 text-lg">
+            <button
+              className="bg-green-500 text-white px-6 py-3 rounded-md hover:bg-green-700 focus:outline-none focus:ring text-lg"
+              onClick={() => navigate("/register")}
+            >
+              Create New Account
+            </button>
+          </span>
+        </div>
+      </div>
     </div>
   );
 };
