@@ -25,8 +25,48 @@ Troubles faced during server setup :-
 5.  Form-data in postman sends binary data, hence multer path is crucial for it to accept
     throught Form-data.
 
-check zustand.
+\*\*check zustand.
 
 To-Do-list
 
-1.  age should be 18+ to register check with dob
+Main :-
+
+!!!!!!IMPORTANT BUG
+-Inifnite request from followerList and comment components.
+
+2.  add comment and likes
+3.  search option - to find username/emailid.
+4.  see more if theres big paras a in post.
+
+Done:-
+
+1.  Update follow,unfollow state
+2.  add follower list-next
+
+3.  Creating a Nav bar
+    Future updates
+    -Explore and see others blog
+    -Category
+    -trending authors recomendation.
+    -recomended blogs - which are trending.
+
+4.  onCLick blog Views blog in a card popup window its called (modal)
+
+    //issue to check -> in paths with /:id if cookies deleted it dsnt lead to the login page
+
+5.  user need to show all users- create a new backend api endpoint for all users so that individual users profile pic can be shown.
+    last. age should be 18+ to register check with dob (do this last dnt forget dumbass) .
+
+6.  updating the state of followed and follower number in profile section.//least prio
+
+Comment Input
+-> Input Field->Enter the data->press enter ->send button
+->sends the data
+->edit option (edited)
+->label to an input field  
+->Comment will be displated as a label
+
+-seperate api call
+
+To-Look at stuff
+-NExtAUth and Auth0

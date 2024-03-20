@@ -1,5 +1,33 @@
 import mongoose from "mongoose";
 
+const commentSchema = mongoose.Schema({
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    required: true,
+  },
+  content: {
+    type: String,
+    required: true,
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  },
+});
+
+const likeSchema = mongoose.Schema({
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    required: true,
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  },
+});
+
 const foodBlogSchema = mongoose.Schema(
   {
     user: {
@@ -29,6 +57,12 @@ const foodBlogSchema = mongoose.Schema(
     isDeleted: {
       type: Boolean,
       default: false,
+    },
+    likes: [likeSchema],
+    comments: [commentSchema],
+    likesCount: {
+      type: Number,
+      default: 0,
     },
   },
 

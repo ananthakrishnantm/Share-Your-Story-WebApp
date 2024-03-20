@@ -2,6 +2,7 @@ import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Buffer } from "buffer";
+import MDEditor from "@uiw/react-md-editor";
 
 function UserBlogView() {
   const [blog, setBlog] = useState();
@@ -42,7 +43,10 @@ function UserBlogView() {
                 />
               )}
               <h2>{data.title}</h2>
-              <h2>{data.content}</h2>
+              <MDEditor.Markdown
+                source={data.content}
+                style={{ whiteSpace: "pre-wrap" }}
+              />
             </div>
           ))}
       </div>

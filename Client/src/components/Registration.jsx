@@ -10,19 +10,10 @@ const Registration = () => {
   const [username, setUserName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
+  const [confirmPassword, setConfirmPassword] = useState("");
   const navigate = useNavigate();
 
   const handleSubmitSignup = () => {
-    // const formData = new FormData();
-    // formData.append("firstName", firstName);
-    // formData.append("middleName", middleName);
-    // formData.append("lastName", lastName);
-    // formData.append("dateOfBirth", dateOfBirth);
-    // formData.append("username", userName);
-    // formData.append("email", email);
-    // formData.append("password", password);
-
     axios
       .post(
         `http://localhost:3000/signup`,
@@ -43,78 +34,101 @@ const Registration = () => {
       .catch((err) => {
         console.log(err);
       });
-
-    // console.log(formData);
   };
 
   return (
-    <div>
-      <h1>SignUp</h1>
-      <div className="flex-col flex justify-center ">
-        <label>First Name : </label>
-        <input
-          type="text"
-          placeholder="Enter first Name"
-          value={firstName}
-          onChange={(e) => setFirstName(e.target.value)}
-        />
-        <label>Middle Name : </label>
-        <input
-          type="text"
-          placeholder="MiddleName"
-          value={middleName}
-          onChange={(e) => setMiddleName(e.target.value)}
-        />
-        <label>Last Name : </label>
-        <input
-          type="text"
-          placeholder="Enter the Last Name"
-          value={lastName}
-          onChange={(e) => setLastName(e.target.value)}
-        />
-        <label>Date Of Birth : </label>
-        <input
-          type="date"
-          placeholder="enter the dob"
-          value={dateOfBirth}
-          onChange={(e) => setDateOfBirth(e.target.value)}
-        />
-        <label>UserName : </label>
-        <input
-          type="text"
-          placeholder="enter the username"
-          value={username}
-          onChange={(e) => setUserName(e.target.value)}
-        />
-        <label>Email</label>
-        <input
-          type="email"
-          placeholder="enter your email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
-        <label>Password</label>
-        <input
-          type="password"
-          placeholder="enter a password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
-        {/* <label>Confirm Passowrd : </label>
-        <input
-          type="password"
-          placeholder="type once more"
-          value={confrimPassword}
-          onChange={(e) => setConfirmPassword(e.target.value)}
-        /> */}
+    <div className="flex justify-center items-center h-screen">
+      <div className="bg-white shadow-md rounded-md p-8 w-120">
+        <h1 className="text-2xl font-bold mb-6 text-center">SignUp</h1>
+        <div className="flex flex-col mb-8">
+          <div className="flex mb-4">
+            <label className="w-full mb-2">First Name:</label>
+            <input
+              type="text"
+              placeholder="First Name"
+              value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
+              className="border border-gray-300 rounded-md px-3 py-2 w-full"
+            />
+          </div>
+          <div className="flex mb-4">
+            <label className="w-full mb-2">Last Name:</label>
+            <input
+              type="text"
+              placeholder="Last Name"
+              value={lastName}
+              onChange={(e) => setLastName(e.target.value)}
+              className="border border-gray-300 rounded-md px-3 py-2 w-full"
+            />
+          </div>
+          <div className="flex mb-4">
+            <label className="w-full mb-2">Middle Name:</label>
+            <input
+              type="text"
+              placeholder="Middle Name"
+              value={middleName}
+              onChange={(e) => setMiddleName(e.target.value)}
+              className="border border-gray-300 rounded-md px-3 py-2 w-full"
+            />
+          </div>
+          <div className="flex mb-4">
+            <label className="w-full mb-2">Date of Birth:</label>
+            <input
+              type="date"
+              placeholder="Date of Birth"
+              value={dateOfBirth}
+              onChange={(e) => setDateOfBirth(e.target.value)}
+              className="border border-gray-300 rounded-md px-3 py-2 w-full"
+            />
+          </div>
+          <div className="flex mb-4">
+            <label className="w-full mb-2">Username:</label>
+            <input
+              type="text"
+              placeholder="Username"
+              value={username}
+              onChange={(e) => setUserName(e.target.value)}
+              className="border border-gray-300 rounded-md px-3 py-2 w-full"
+            />
+          </div>
+          <div className="flex mb-4">
+            <label className="w-full mb-2">Email:</label>
+            <input
+              type="email"
+              placeholder="Email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="border border-gray-300 rounded-md px-3 py-2 w-full"
+            />
+          </div>
+          <div className="flex mb-4">
+            <label className="w-full mb-2">Password:</label>
+            <input
+              type="password"
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="border border-gray-300 rounded-md px-3 py-2 w-full"
+            />
+          </div>
+          <div className="flex mb-4">
+            <label className="w-full mb-2">Confirm Password:</label>
+            <input
+              type="password"
+              placeholder="Confirm Password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              className="border border-gray-300 rounded-md px-3 py-2 w-full"
+            />
+          </div>
+        </div>
         <button
-          className="bg-gray-700 text-white px-4 py-2 rounded-md hover:bg-gray-900 focus:outline-none focus:ring  mt-5"
+          className="bg-green-600 text-white text-2xl px-6 py-3 rounded-md hover:bg-green-400 focus:outline-none focus:ring w-full mt-auto"
           onClick={handleSubmitSignup}
         >
           Submit
         </button>
       </div>
-      <h1>BRB</h1>
     </div>
   );
 };

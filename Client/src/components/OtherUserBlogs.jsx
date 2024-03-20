@@ -3,22 +3,22 @@ import React, { useEffect, useState } from "react";
 import { Buffer } from "buffer";
 import "./userBlogs.css";
 
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import UserBlogView from "./UserBlogOpearations/UserBlogView";
 import UserBlogDelete from "./UserBlogOpearations/UserBlogDelete";
 import MDEditor from "@uiw/react-md-editor";
 import Navbar from "./Navbar";
 
-function UserBlogs(blogId) {
+function OtherUserBlogs() {
   const [userData, setUserData] = useState({});
   const [userBlogs, setUserBlogs] = useState([]);
-
+  const { userId } = useParams();
   // const [loggedIn, setLoggedIn] = useState(false);
   const navigate = useNavigate();
   const handleHome = () => {
     navigate("/home");
   };
-
+  console.log(userId);
   useEffect(() => {
     try {
       // Decode the token to get user information
@@ -28,7 +28,7 @@ function UserBlogs(blogId) {
 
       // Fetch user details and blogs together
       axios
-        .get(`http://localhost:3000/blog/user/:userId/blogs`, {
+        .get(`http://localhost:3000/profile/users/${userId}/blogs`, {
           withCredentials: true,
         })
         .then((response) => {
@@ -45,7 +45,7 @@ function UserBlogs(blogId) {
     }
   }, [navigate]);
 
-  console.log(userBlogs);
+  console.log(userId);
 
   const formatDate = (timeStamp) => {
     const options = {
@@ -60,13 +60,13 @@ function UserBlogs(blogId) {
 
   return (
     <div>
-      <div className="mb-10">
+      <div className="mb-20">
         <Navbar />
       </div>
       <div>
         {userBlogs.map((blog, index) => (
           <div className=" max-w-3xl mx-auto " key={index}>
-            <div className="bg-white rounded-sm overflow-hidden shadow-custom mb-2 hover:transform scale-105 transition-transform duration-300">
+            <div className="bg-white rounded-sm overflow-hidden shadow-custom mb-20 hover:transform scale-105 transition-transform duration-300">
               {/*Always perfome the checks if to see if the item is present*/}
               {blog.image && blog.image.contentType && (
                 <img
@@ -90,16 +90,6 @@ function UserBlogs(blogId) {
                   Created on:{formatDate(blog.createdAt)}
                 </p>
               </div>
-              <div className="mb-5 px-6">
-                <Link to={`/home/userId/View/${blog._id}`}>
-                  <button>ViewBlog</button>|
-                </Link>
-                <Link to={`/home/userId/Edit/${blog._id}`}>
-                  <button>EditBlog</button>
-                </Link>
-                |
-                <UserBlogDelete blogId={blog._id} key={blog._id} />
-              </div>
             </div>
           </div>
         ))}
@@ -108,4 +98,4 @@ function UserBlogs(blogId) {
   );
 }
 
-export default UserBlogs;
+export default OtherUserBlogs;
