@@ -98,12 +98,12 @@ followerRoute.get(
 );
 
 followerRoute.delete(
-  "/blog/users/:userId/:followerId",
+  "/blog/users/:userId/:userToUnFollowId",
   decodedToken,
   async (request, response) => {
     try {
       const userId = request.userId;
-      const userToUnfollowId = request.params.followerId;
+      const userToUnfollowId = request.params.userToUnFollowId;
 
       console.log(userToUnfollowId);
 

@@ -1,6 +1,8 @@
 import axios from "axios";
 import React, { useState } from "react";
+import io from "socket.io-client";
 import { Link, useNavigate } from "react-router-dom";
+
 import "./login.css";
 
 const Login = ({ setToken }) => {
@@ -9,6 +11,7 @@ const Login = ({ setToken }) => {
   const navigate = useNavigate();
 
   const handleLogin = () => {
+    const socket = io("http://localhost:3000");
     axios
       .post(
         "http://localhost:3000/login",
@@ -17,6 +20,7 @@ const Login = ({ setToken }) => {
       )
       .then((res) => {
         // localStorage.setItem("token", token);
+        socket.emit("checkUserOnline", res.data.userId);
         navigate("/home");
         console.log("logged in");
       })

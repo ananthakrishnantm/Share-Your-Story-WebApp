@@ -31,6 +31,9 @@ To-Do-list
 
 Main :-
 
+!!!!!!IMPORTANT BUG
+-Inifnite request from followerList and comment components.
+
 2.  add comment and likes
 3.  search option - to find username/emailid.
 4.  see more if theres big paras a in post.

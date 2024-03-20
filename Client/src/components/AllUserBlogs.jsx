@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import axios from "axios";
 import { Buffer } from "buffer";
 import { Link, useNavigate, useParams } from "react-router-dom";
@@ -12,7 +12,8 @@ const AllUserBlogs = ({ triggerFetch }) => {
   const navigate = useNavigate();
   const { id } = useParams();
 
-  const fetchData = async () => {
+  // Callback functions using useCallback
+  const fetchData = useCallback(async () => {
     try {
       const response = await axios.get("http://localhost:3000/blog", {
         withCredentials: true,
@@ -29,9 +30,9 @@ const AllUserBlogs = ({ triggerFetch }) => {
     } catch (error) {
       console.log(error);
     }
-  };
+  }, []);
 
-  const fetchProfilePics = async (userIDs) => {
+  const fetchProfilePics = useCallback(async (userIDs) => {
     try {
       const promises = userIDs.map((userID) =>
         axios.get(`http://localhost:3000/profile/blog/${userID}`, {
@@ -50,9 +51,9 @@ const AllUserBlogs = ({ triggerFetch }) => {
     } catch (error) {
       console.log(error);
     }
-  };
+  }, []);
 
-  const formatDate = (timeStamp) => {
+  const formatDate = useCallback((timeStamp) => {
     const options = {
       year: "numeric",
       month: "long",
@@ -61,11 +62,11 @@ const AllUserBlogs = ({ triggerFetch }) => {
       minute: "numeric",
     };
     return new Date(timeStamp).toLocaleString("en-US", options);
-  };
+  }, []);
 
   useEffect(() => {
     fetchData();
-  }, [triggerFetch]);
+  }, [fetchData, triggerFetch]);
 
   return (
     <div>

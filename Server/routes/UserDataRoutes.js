@@ -55,6 +55,22 @@ user.get("/:userId", decodedToken, async (request, response) => {
   }
 });
 
+// to search for users
+user.get("/data/search", async (req, res) => {
+  const { username } = req.query;
+  console.log(username);
+  try {
+    const users = await User.find({
+      username: { $regex: username, $options: "i" },
+    }).select(" -password -role");
+
+    res.status(200).json(users);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send({ message: "Internal server error" });
+  }
+});
+
 user.get("/data/:userId", decodedToken, async (request, response) => {
   try {
     const userId = request.userId; // Access userId from request params
@@ -71,7 +87,7 @@ user.get("/data/:userId", decodedToken, async (request, response) => {
 user.get("/blog/:user", async (request, response) => {
   try {
     const userId = request.params.user; // Access userIds from request params
-
+    console.log(userId);
     const userData = await User.findById(userId)
       .select("-password")
       .select("-role"); // Use find() with $in operator to retrieve multiple users

@@ -23,8 +23,6 @@ const CommentSection = ({ blogId, userId }) => {
       });
   };
 
-  console.log("this is the logged data ", loggedInUserData);
-
   const displayComments = () => {
     const apiUrl = `http://localhost:3000/blog/user/:userId/blogs/${blogId}/comments`;
     axios
@@ -49,7 +47,11 @@ const CommentSection = ({ blogId, userId }) => {
         { withCredentials: true }
       )
       .then((response) => {
-        setCommentInputData(response.data.data);
+        displayComments();
+        // Update commentData state with the new comment
+        setCommentData((prevComments) => [...prevComments, response.data.data]);
+        // Clear comment input
+        setCommentInputData("");
       })
       .catch((error) => {
         console.log(error);
@@ -67,6 +69,7 @@ const CommentSection = ({ blogId, userId }) => {
     axios
       .put(apiUrl, { commentText: editedContent }, { withCredentials: true })
       .then((response) => {
+        displayComments();
         setEditedComment(null);
         setEditedContent("");
       })
@@ -81,6 +84,7 @@ const CommentSection = ({ blogId, userId }) => {
     axios
       .delete(apiUrl, { withCredentials: true })
       .then((response) => {
+        displayComments();
         setCommentData(response.data.data);
       })
       .catch((error) => {
@@ -89,6 +93,8 @@ const CommentSection = ({ blogId, userId }) => {
   };
 
   useEffect(() => {
+    loggedUserData();
+
     displayComments();
   }, []);
 

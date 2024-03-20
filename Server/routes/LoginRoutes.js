@@ -16,7 +16,7 @@ authRouter.post("/", async (request, response) => {
 
   try {
     const user = await User.findOne({ email });
-    console.log(user);
+    console.log("logged in");
 
     if (!user) {
       return response.status(404).json({ message: "invalid username" });
@@ -33,7 +33,7 @@ authRouter.post("/", async (request, response) => {
     //user authenticated,generate JWT token.
 
     const token = jwt.sign({ userId: user._id }, secretKey);
-    console.log(token);
+    console.log("done");
 
     //cookie created here
     response.cookie("cookie", token, {

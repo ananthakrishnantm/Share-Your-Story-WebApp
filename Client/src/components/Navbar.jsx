@@ -1,6 +1,6 @@
-import axios from "axios";
 import React, { useEffect, useState } from "react";
-import { Link, Navigate, useNavigate } from "react-router-dom";
+import axios from "axios";
+import { Link, useNavigate } from "react-router-dom";
 import { Buffer } from "buffer";
 import { styled, alpha } from "@mui/material/styles";
 import AppBar from "@mui/material/AppBar";
@@ -8,16 +8,16 @@ import Box from "@mui/material/Box";
 import Toolbar from "@mui/material/Toolbar";
 import IconButton from "@mui/material/IconButton";
 import Typography from "@mui/material/Typography";
-import InputBase from "@mui/material/InputBase";
 import Badge from "@mui/material/Badge";
-import MenuItem from "@mui/material/MenuItem";
 import Menu from "@mui/material/Menu";
-import MenuIcon from "@mui/icons-material/Menu";
-import SearchIcon from "@mui/icons-material/Search";
-import AccountCircle from "@mui/icons-material/AccountCircle";
+import MenuItem from "@mui/material/MenuItem";
 import MailIcon from "@mui/icons-material/Mail";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import MoreIcon from "@mui/icons-material/MoreVert";
+import SearchOption from "./SideBar/SearchOption";
+
+// Import React dummy image
+import { Avatar as DummyAvatar } from "@mui/material";
 
 const Search = styled("div")(({ theme }) => ({
   position: "relative",
@@ -35,39 +35,16 @@ const Search = styled("div")(({ theme }) => ({
   },
 }));
 
-const SearchIconWrapper = styled("div")(({ theme }) => ({
-  padding: theme.spacing(0, 2),
-  height: "100%",
-  position: "absolute",
-  pointerEvents: "none",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-}));
-
-const StyledInputBase = styled(InputBase)(({ theme }) => ({
-  color: "inherit",
-  "& .MuiInputBase-input": {
-    padding: theme.spacing(1, 1, 1, 0),
-    // vertical padding + font size from searchIcon
-    paddingLeft: `calc(1em + ${theme.spacing(4)})`,
-    transition: theme.transitions.create("width"),
-    width: "100%",
-    [theme.breakpoints.up("md")]: {
-      width: "20ch",
-    },
-  },
-}));
-
-export default function PrimarySearchAppBar() {
-  const [anchorEl, setAnchorEl] = React.useState(null);
-  const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState(null);
-
-  const isMenuOpen = Boolean(anchorEl);
-  const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
-
+const PrimarySearchAppBar = () => {
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = useState(null);
   const [profile, setProfile] = useState("");
   const navigate = useNavigate();
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const handleSearchInputChange = (e) => {
+    setSearchQuery(e.target.value);
+  };
 
   useEffect(() => {
     axios
@@ -80,12 +57,15 @@ export default function PrimarySearchAppBar() {
       });
   }, []);
 
+  const handleSearchIconClick = () => {
+    navigate(`/searchresults/${searchQuery}`);
+  };
+
   const handleProfileMenuOpen = (event) => {
     setAnchorEl(event.currentTarget);
   };
 
   const handleMobileMenuClose = () => {
-    // navigate("/profile/:userId");
     setMobileMoreAnchorEl(null);
   };
 
@@ -112,7 +92,7 @@ export default function PrimarySearchAppBar() {
         vertical: "top",
         horizontal: "right",
       }}
-      open={isMenuOpen}
+      open={Boolean(anchorEl)}
       onClose={handleMenuClose}
     >
       <MenuItem onClick={handleMenuClose}>
@@ -136,7 +116,7 @@ export default function PrimarySearchAppBar() {
         vertical: "top",
         horizontal: "right",
       }}
-      open={isMobileMenuOpen}
+      open={Boolean(mobileMoreAnchorEl)}
       onClose={handleMobileMenuClose}
     >
       <MenuItem>
@@ -175,7 +155,7 @@ export default function PrimarySearchAppBar() {
           aria-haspopup="true"
           color="inherit"
         >
-          {profile.profilePicture && (
+          {profile.profilePicture ? (
             <img
               className=" w-10 h-10 object-cover object-center rounded-full"
               src={`data:${
@@ -184,6 +164,11 @@ export default function PrimarySearchAppBar() {
                 "base64"
               )}`}
               alt={profile.title}
+            />
+          ) : (
+            <DummyAvatar
+              className=" w-10 h-10 object-cover object-center rounded-full"
+              alt="Dummy Image"
             />
           )}
         </IconButton>
@@ -208,15 +193,11 @@ export default function PrimarySearchAppBar() {
               Logo
             </Typography>
           </Link>
-          <Search>
-            <SearchIconWrapper>
-              <SearchIcon />
-            </SearchIconWrapper>
-            <StyledInputBase
-              placeholder="Search…"
-              inputProps={{ "aria-label": "search" }}
-            />
-          </Search>
+          <SearchOption
+            searchQuery={searchQuery}
+            handleSearchInputChange={handleSearchInputChange}
+            handleSearchIconClick={handleSearchIconClick}
+          />
           <Box sx={{ flexGrow: 1 }} />
           <Box sx={{ display: { xs: "none", md: "flex" } }}>
             <IconButton
@@ -246,7 +227,7 @@ export default function PrimarySearchAppBar() {
               onClick={handleProfileMenuOpen}
               color="inherit"
             >
-              {profile.profilePicture && (
+              {profile.profilePicture ? (
                 <img
                   className=" w-10 h-10 object-cover object-center rounded-full"
                   src={`data:${
@@ -255,6 +236,11 @@ export default function PrimarySearchAppBar() {
                     profile.profilePicture.data.data
                   ).toString("base64")}`}
                   alt={profile.title}
+                />
+              ) : (
+                <DummyAvatar
+                  className=" w-10 h-10 object-cover object-center rounded-full"
+                  alt="Dummy Image"
                 />
               )}
             </IconButton>
@@ -277,4 +263,6 @@ export default function PrimarySearchAppBar() {
       {renderMenu}
     </Box>
   );
-}
+};
+
+export default PrimarySearchAppBar;

@@ -4,10 +4,10 @@ import AllUserBlogs from "./AllUserBlogs";
 import Navbar from "./Navbar";
 import SideBar from "./SideBar/SideBar";
 import FollowBar from "./SideBar/FollowBar";
-import RightSideBar from "./SideBar/RightSideBar";
 import ViewProfileLogic from "./UserComponents/ViewProfileLogic";
 import ViewProfileSecondary from "./UserComponents/ViewProfileSecondary";
 import FollowingList from "./SideBar/FollowingList";
+import SearchOption from "./SideBar/SearchOption";
 
 function Home() {
   const [triggerFetch, setTriggerFetch] = useState(false);

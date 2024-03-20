@@ -109,6 +109,34 @@ router.get("/user/:userId/blogs", async (request, response) => {
   }
 });
 
+router.get("/:userId/blogs", async (request, response) => {
+  try {
+    const userId = request.params.userId;
+
+    console.log("Type of userId:", userId);
+
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+      console.error("invalid object id format");
+      return response.status(400).json({ message: "invalid id format" });
+    }
+    //find and findOne can cause issue when mapping
+    //find sends an array findbyId sends object
+    const Fblog = await FoodBlog.find({
+      user: userId,
+      isDeleted: false,
+    });
+
+    if (!Fblog) {
+      console.log("blog not found");
+      return response.status(404).json({ message: "BlogNotFound" });
+    }
+    return response.status(200).json(Fblog);
+  } catch (err) {
+    console.log(err);
+    response.status(500).send(err);
+  }
+});
+
 //Route to update one file
 router.put(
   "/user/:userId/blogs/:blogId",
@@ -408,7 +436,7 @@ router.put(
       // Save the updated blog post
       const updatedBlog = await blog.save();
 
-      return response.status(200).json(updatedBlog, {});
+      return response.status(200).json(updatedBlog);
     } catch (err) {
       console.error(err.message);
       response.status(500).json({ message: "Internal server error" });
