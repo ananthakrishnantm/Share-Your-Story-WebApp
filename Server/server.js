@@ -12,6 +12,9 @@ import logoutMethod from "./routes/LogoutRoute.js";
 import user from "./routes/UserDataRoutes.js";
 import followerRoute from "./routes/FollowersData.js";
 import { Server } from "socket.io"; // Import Server from the socket.io package
+// import { dirname, join } from "path";
+import { fileURLToPath } from "url";
+import path from "path";
 
 const { origin_Link } = process.env;
 const app = express();
@@ -31,6 +34,8 @@ const io = new Server(server, {
     methods: ["GET", "POST"],
   },
 });
+const __dirname = path.resolve();
+app.use(express.static(path.join(__dirname, "../Client/dist")));
 
 // Attach the event listener using the imported SocketServer function
 io.on("connection", (socket) => {
@@ -50,19 +55,24 @@ app.use(express.json());
 // return response.status(234).send("its successful");
 // });
 
-app.use("/profile", user);
+app.use("/api/profile", user);
 
 //route for blog
-app.use("/blog", foodRouter);
+app.use("/api/blog", foodRouter);
 
 //route for users
-app.use("/signup", registerRouter);
+app.use("/api/signup", registerRouter);
 
 //route for Login
-app.use("/login", authRouter);
+app.use("/api/login", authRouter);
 
-app.use("/logout", logoutMethod);
-app.use("/follower", followerRoute);
+app.use("/api/logout", logoutMethod);
+
+app.use("/api/follower", followerRoute);
+
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "../Client/dist", "index.html"));
+});
 
 //using sockets for blogs
 mongoose

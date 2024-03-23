@@ -11,10 +11,10 @@ const AllUserBlogs = ({ triggerFetch }) => {
   const [profilePics, setProfilePics] = useState([]);
   const navigate = useNavigate();
   const { id } = useParams();
+  const apiBaseUrl = import.meta.env.VITE_API_URL;
 
   // Callback functions using useCallback
   const fetchData = useCallback(async () => {
-    const apiBaseUrl = import.meta.env.VITE_API_URL;
     const path = "/blog";
     try {
       const response = await axios.get(apiBaseUrl + path, {
@@ -35,9 +35,11 @@ const AllUserBlogs = ({ triggerFetch }) => {
   }, []);
 
   const fetchProfilePics = useCallback(async (userIDs) => {
+    const path = `/profile/blog/${userID}`;
+    const apiUrl = apiBaseUrl + path;
     try {
       const promises = userIDs.map((userID) =>
-        axios.get(`http://localhost:3000/profile/blog/${userID}`, {
+        axios.get(apiUrl, {
           withCredentials: true,
         })
       );
