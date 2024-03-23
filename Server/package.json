@@ -7,8 +7,9 @@
   "scripts": {
     "//": "add start and dev start as extra for starting server and setting nodemon",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js",
-    "dev": "nodemon server.js"
+    "start": " node server.js",
+    "dev": "npm install && nodemon server.js",
+    "buildClient": "cd ../Client &&  npm install && npm run build"
   },
   "keywords": [],
   "author": "",
