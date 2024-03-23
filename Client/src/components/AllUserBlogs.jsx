@@ -14,8 +14,10 @@ const AllUserBlogs = ({ triggerFetch }) => {
 
   // Callback functions using useCallback
   const fetchData = useCallback(async () => {
+    const apiBaseUrl = import.meta.env.VITE_API_URL;
+    const path = "/blog";
     try {
-      const response = await axios.get("http://localhost:3000/blog", {
+      const response = await axios.get(apiBaseUrl + path, {
         withCredentials: true,
       });
 

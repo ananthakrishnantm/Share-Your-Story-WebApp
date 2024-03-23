@@ -11,13 +11,13 @@ const Login = ({ setToken }) => {
   const navigate = useNavigate();
 
   const handleLogin = () => {
-    const socket = io("http://localhost:3000");
+    const apiBaseUrl = import.meta.env.VITE_API_URL;
+    const path = "/login";
+
+    const apiUrl = apiBaseUrl + path;
+    const socket = io(apiBaseUrl);
     axios
-      .post(
-        "http://localhost:3000/login",
-        { email, password },
-        { withCredentials: true }
-      )
+      .post(apiUrl, { email, password }, { withCredentials: true })
       .then((res) => {
         // localStorage.setItem("token", token);
         socket.emit("checkUserOnline", res.data.userId);

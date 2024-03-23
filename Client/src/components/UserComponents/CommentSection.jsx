@@ -10,7 +10,9 @@ const CommentSection = ({ blogId, userId }) => {
   const [loggedInUserData, setLoggedInUserData] = useState({});
 
   const loggedUserData = () => {
-    const apiUrl = `http://localhost:3000/profile/data/:userId`;
+    const apiBaseUrl = import.meta.env.VITE_API_URL;
+    const path = `/profile/data/:userId`;
+    const apiUrl = apiBaseUrl + path;
     axios
       .get(apiUrl, {
         withCredentials: true,
@@ -24,7 +26,9 @@ const CommentSection = ({ blogId, userId }) => {
   };
 
   const displayComments = () => {
-    const apiUrl = `http://localhost:3000/blog/user/:userId/blogs/${blogId}/comments`;
+    const apiBaseUrl = import.meta.env.VITE_API_URL;
+    const path = `/blog/user/:userId/blogs/${blogId}/comments`;
+    const apiUrl = apiBaseUrl + path;
     axios
       .get(apiUrl, {
         withCredentials: true,

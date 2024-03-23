@@ -8,11 +8,14 @@ const SearchResult = () => {
   const [searchResults, setSearchResults] = useState([]);
   const { query } = useParams();
   const navigate = useNavigate();
+  const apiBaseUrl = import.meta.env.VITE_API_URL;
 
   const fetchSearchResult = () => {
-    const url = `http://localhost:3000/profile/data/search?username=${query}`;
+    const path = `/profile/data/search?username=${query}`;
+    const apiUrl = apiBaseUrl + path;
+
     axios
-      .get(url, { withCredentials: true })
+      .get(apiUrl, { withCredentials: true })
       .then((response) => {
         setSearchResults(response.data);
       })

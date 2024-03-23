@@ -12,6 +12,7 @@ const secretKey = process.env.JWT_SECRET_KEY;
 const authRouter = express.Router();
 
 authRouter.post("/", async (request, response) => {
+  console.log();
   const { email, password } = request.body;
 
   try {

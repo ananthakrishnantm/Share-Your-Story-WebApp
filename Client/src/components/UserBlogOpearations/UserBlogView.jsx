@@ -7,13 +7,16 @@ import MDEditor from "@uiw/react-md-editor";
 function UserBlogView() {
   const [blog, setBlog] = useState();
   const [loggedIn, setLoggedIn] = useState(false);
+  const apiBaseUrl = import.meta.env.VITE_API_URL;
 
   const { blogId } = useParams();
   const navigate = useNavigate();
 
   useEffect(() => {
+    const path = `/blog/user/:userId/blogs/${blogId}`;
+    const apiUrl = apiBaseUrl + path;
     axios
-      .get(`http://localhost:3000/blog/user/:userId/blogs/${blogId}`, {
+      .get(apiUrl, {
         withCredentials: true,
       })
       .then((response) => {

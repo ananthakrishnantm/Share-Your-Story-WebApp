@@ -4,10 +4,13 @@ import { useNavigate, useParams } from "react-router-dom";
 
 const UserBlogDelete = ({ blogId }) => {
   const navigate = useNavigate();
-
+  const apiBaseUrl = import.meta.env.VITE_API_URL;
   const handleDeleteBlog = () => {
+    const path = `/blog/user/:userId/blogs/${blogId}`;
+    const apiUrl = apiBaseUrl + path;
+
     axios
-      .delete(`http://localhost:3000/blog/user/:userId/blogs/${blogId}`, {
+      .delete(apiUrl, {
         withCredentials: true,
       })
       .then(() => {

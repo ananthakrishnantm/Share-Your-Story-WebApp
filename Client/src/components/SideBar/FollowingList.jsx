@@ -13,14 +13,16 @@ import {
 const FollowingList = () => {
   const [userData, setUserData] = useState({});
   const [followersData, setFollowersData] = useState([]);
+  const apiBaseUrl = import.meta.env.VITE_API_URL;
 
   useEffect(() => {
     followerData();
   }, []);
 
   const followerData = () => {
-    const apiUrl =
-      "http://localhost:3000/follower/blog/users/:userId/following";
+    const path = "/follower/blog/users/:userId/following";
+    const apiUrl = apiBaseUrl + path;
+
     axios
       .get(apiUrl, {
         withCredentials: true,

@@ -15,13 +15,16 @@ const SearchProfile = () => {
   const [userData, setUserData] = useState();
   const [userBlogs, setUserBlogs] = useState([]);
   const { userId } = useParams("");
+  const apiBaseUrl = import.meta.env.VITE_API_URL;
 
   console.log(userId);
 
   const fetchUserData = () => {
-    const url = `http://localhost:3000/profile/blog/${userId}`;
+    const path = `/profile/blog/${userId}`;
+    const apiUrl = apiBaseUrl + path;
+
     axios
-      .get(url, {
+      .get(apiUrl, {
         withCredentials: true,
       })
 

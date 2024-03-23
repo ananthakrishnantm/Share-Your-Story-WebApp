@@ -4,6 +4,7 @@ import FavoriteIcon from "@mui/icons-material/Favorite";
 
 export const LikeUnlikeComponent = ({ blogId }) => {
   const [displaylike, setDisplayLike] = useState([]);
+  const apiBaseUrl = import.meta.env.VITE_API_URL;
 
   useEffect(() => {
     likeUnlike();
@@ -11,9 +12,12 @@ export const LikeUnlikeComponent = ({ blogId }) => {
 
   const handleLikeUnlike = (actionType) => {
     console.log("Action type:", actionType);
+    const path = `/blog/user/:userId/blogs/${blogId}/like`;
+    const apiUrl = apiBaseUrl + path;
+
     axios
       .put(
-        `http://localhost:3000/blog/user/:userId/blogs/${blogId}/like`,
+        apiUrl,
         {
           action: actionType,
         },
@@ -30,8 +34,11 @@ export const LikeUnlikeComponent = ({ blogId }) => {
   };
 
   const likeUnlike = () => {
+    const path = `/blog/user/:userId/blogs/${blogId}/like`;
+    const apiUrl = apiBaseUrl + path;
+
     axios
-      .get(`http://localhost:3000/blog/user/:userId/blogs/${blogId}/like`, {
+      .get(apiUrl, {
         withCredentials: true,
       })
       .then((response) => {

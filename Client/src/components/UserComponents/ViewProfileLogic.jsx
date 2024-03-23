@@ -18,6 +18,8 @@ const ViewProfileLogic = () => {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
 
+  const apiBaseUrl = import.meta.env.VITE_API_URL;
+
   //for the modal
   const openModal = () => {
     setIsModalOpen(true);
@@ -33,8 +35,11 @@ const ViewProfileLogic = () => {
   }, [reload]);
 
   const fetchData = () => {
+    const path = "/profile/:userid";
+    const apiUrl = apiBaseUrl + path;
+
     axios
-      .get("http://localhost:3000/profile/:userid", { withCredentials: true })
+      .get(apiUrl, { withCredentials: true })
       .then((response) => {
         setData(response.data.data);
         setFirstName(response.data.data.firstName);
@@ -58,8 +63,12 @@ const ViewProfileLogic = () => {
     const profilePicFile = new FormData();
 
     profilePicFile.append("profilePicture", selectedProfilePic);
+
+    const path = "/profile/:userId";
+    const apiUrl = apiBaseUrl + path;
+
     axios
-      .put("http://localhost:3000/profile/:userId", profilePicFile, {
+      .put(apiUrl, profilePicFile, {
         withCredentials: true,
       })
       .then(() => {
@@ -76,6 +85,9 @@ const ViewProfileLogic = () => {
   };
 
   const handleSave = () => {
+    const path = "/profile/:userid";
+    const apiUrl = apiBaseUrl + path;
+
     const formData = new FormData();
     formData.append("firstName", firstName);
     formData.append("middleName", middleName);
@@ -84,7 +96,7 @@ const ViewProfileLogic = () => {
 
     // Update the profile on the server
     axios
-      .put("http://localhost:3000/profile/:userid", formData, {
+      .put(apiUrl, formData, {
         withCredentials: true,
       })
       .then(() => {

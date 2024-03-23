@@ -8,6 +8,7 @@ import UserBlogView from "./UserBlogOpearations/UserBlogView";
 import UserBlogDelete from "./UserBlogOpearations/UserBlogDelete";
 import MDEditor from "@uiw/react-md-editor";
 import Navbar from "./Navbar";
+import path from "path";
 
 function OtherUserBlogs() {
   const [userData, setUserData] = useState({});
@@ -27,8 +28,12 @@ function OtherUserBlogs() {
       // setLoggedIn(true);
 
       // Fetch user details and blogs together
+
+      const apiBaseUrl = import.meta.env.VITE_API_URL;
+      const path = `/profile/users/${userId}/blogs`;
+
       axios
-        .get(`http://localhost:3000/profile/users/${userId}/blogs`, {
+        .get(apiBaseUrl + path, {
           withCredentials: true,
         })
         .then((response) => {

@@ -13,8 +13,12 @@ const UserBlogEdit = () => {
   const [loggedIn, setLoggedIn] = useState(false);
   const { blogId } = useParams();
   const navigate = useNavigate();
+  const apiBaseUrl = import.meta.env.VITE_API_URL;
 
   const handleEditBlog = () => {
+    const path = `/blog/user/:userId/blogs/${blogId}`;
+    const apiUrl = apiBaseUrl + path;
+
     const formData = new FormData();
     formData.append("title", title);
     formData.append("content", content);
@@ -23,13 +27,9 @@ const UserBlogEdit = () => {
     console.log(blogId);
 
     axios
-      .put(
-        `http://localhost:3000/blog/user/:userId/blogs/${blogId}`,
-        formData,
-        {
-          withCredentials: true,
-        }
-      )
+      .put(apiUrl, formData, {
+        withCredentials: true,
+      })
       .then((response) => {
         navigate("/home");
       })

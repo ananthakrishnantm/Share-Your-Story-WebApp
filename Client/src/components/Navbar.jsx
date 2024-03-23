@@ -47,8 +47,10 @@ const PrimarySearchAppBar = () => {
   };
 
   useEffect(() => {
+    const apiBaseUrl = import.meta.env.VITE_API_URL;
+    const path = "/profile/:userid";
     axios
-      .get("http://localhost:3000/profile/:userid", { withCredentials: true })
+      .get(apiBaseUrl + path, { withCredentials: true })
       .then((response) => {
         setProfile(response.data.data);
       })

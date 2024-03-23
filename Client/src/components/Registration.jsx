@@ -14,9 +14,12 @@ const Registration = () => {
   const navigate = useNavigate();
 
   const handleSubmitSignup = () => {
+    const apiBaseUrl = import.meta.env.VITE_API_URL;
+    const path = `/signup`;
+    const apiUrl = apiBaseUrl + path;
     axios
       .post(
-        `http://localhost:3000/signup`,
+        apiUrl,
         {
           firstName,
           middleName,

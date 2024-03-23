@@ -4,9 +4,13 @@ import axios from "axios";
 
 const SideBar = () => {
   const navigate = useNavigate();
+  const apiBaseUrl = import.meta.env.VITE_API_URL;
 
   const handleLogout = () => {
-    axios.post("http://localhost:3000/logout", {}, { withCredentials: true });
+    const path = "/logout";
+    const apiUrl = apiBaseUrl + path;
+
+    axios.post(apiUrl, {}, { withCredentials: true });
     navigate("/login");
   };
   return (
