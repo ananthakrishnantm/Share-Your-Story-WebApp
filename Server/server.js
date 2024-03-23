@@ -13,11 +13,12 @@ import user from "./routes/UserDataRoutes.js";
 import followerRoute from "./routes/FollowersData.js";
 import { Server } from "socket.io"; // Import Server from the socket.io package
 
+const { origin_Link } = process.env;
 const app = express();
 const server = http.createServer(app); // Create the HTTP server
 
 const corsOptions = {
-  origin: "http://localhost:5173", // Replace with your actual frontend domain
+  origin: origin_Link, // Replace with your actual frontend domain
   credentials: true,
 };
 
@@ -26,7 +27,7 @@ app.use(cors(corsOptions));
 // Create the Socket.IO instance
 const io = new Server(server, {
   cors: {
-    origin: "http://localhost:5173",
+    origin: origin_Link,
     methods: ["GET", "POST"],
   },
 });
