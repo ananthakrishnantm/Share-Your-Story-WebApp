@@ -22,9 +22,7 @@ function Home() {
       <div className="flex justify-center mt-10 m-20">
         <div>
           <ViewProfileSecondary />
-          <div className="mt-5  ">
-            <FollowBar />
-          </div>
+          <div className="mt-5  ">{/* <FollowBar /> */}</div>
         </div>
         <div className="flex-1">
           <Upload updateBlogList={updateBlogList} />
