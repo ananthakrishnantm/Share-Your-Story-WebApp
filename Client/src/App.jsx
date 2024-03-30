@@ -1,5 +1,5 @@
 import "./App.css";
-import { Route, Routes, BrowserRouter } from "react-router-dom";
+import { Route, Routes, BrowserRouter, Navigate } from "react-router-dom";
 import Login from "./components/Login";
 import Registration from "./components/Registration";
 import Upload from "./components/Upload";
@@ -14,7 +14,7 @@ import ViewProfile from "./components/UserComponents/ViewProfile";
 import OtherUserBlogs from "./components/OtherUserBlogs";
 import { LikeUnlikeComponent } from "./components/UserComponents/LikeUnlikeComponent";
 import SearchOption from "./components/SideBar/SearchOption";
-import SearchResult from "./components/SideBar/SearchResult"; // Import the SearchResult component
+import SearchResult from "./components/SideBar/SearchResult";
 import SearchProfile from "./components/UserComponents/SearchProfile";
 
 function App() {
@@ -39,6 +39,7 @@ function App() {
         ]}
       >
         <Routes>
+          <Route path="/" element={<Navigate to="/login" />} />
           <Route path="/home" element={<Home />} />
           <Route path="/upload" element={<Upload />} />
           <Route path="/Search" element={<SearchOption />} />
