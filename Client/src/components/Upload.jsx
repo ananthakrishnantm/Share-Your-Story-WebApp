@@ -15,13 +15,16 @@ const Upload = ({ updateBlogList }) => {
   const navigate = useNavigate();
 
   const handleCreateBlog = () => {
+    const apiBaseUrl = import.meta.env.VITE_API_URL;
+    const path = `/blog/uploads/`;
+
     const formData = new FormData();
     formData.append("title", title);
     formData.append("content", content);
     formData.append("image", image);
 
     axios
-      .post("http://localhost:3000/blog/uploads/", formData, {
+      .post(apiBaseUrl + path, formData, {
         withCredentials: true,
       })
       .then((response) => {

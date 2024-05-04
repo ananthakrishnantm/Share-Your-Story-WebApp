@@ -9,11 +9,15 @@ import { Buffer } from "buffer";
 
 function ViewProfileSecondary() {
   const [data, setData] = useState([]);
+  const apiBaseUrl = import.meta.env.VITE_API_URL;
 
   useEffect(() => {
     const profilePictureData = () => {
+      const path = "/profile/:userId";
+      const apiUrl = apiBaseUrl + path;
+
       axios
-        .get("http://localhost:3000/profile/:userId", {
+        .get(apiUrl, {
           withCredentials: true,
         })
         .then((response) => {

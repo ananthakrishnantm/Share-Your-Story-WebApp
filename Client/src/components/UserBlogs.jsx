@@ -21,6 +21,9 @@ function UserBlogs(blogId) {
 
   useEffect(() => {
     try {
+      const apiBaseUrl = import.meta.env.VITE_API_URL;
+      const path = `/blog/user/:userId/blogs`;
+
       // Decode the token to get user information
       // const decodedToken = jwtDecode(token);
       // const userIdFromToken = decodedToken.payload.userId;
@@ -28,7 +31,7 @@ function UserBlogs(blogId) {
 
       // Fetch user details and blogs together
       axios
-        .get(`http://localhost:3000/blog/user/:userId/blogs`, {
+        .get(apiBaseUrl + path, {
           withCredentials: true,
         })
         .then((response) => {

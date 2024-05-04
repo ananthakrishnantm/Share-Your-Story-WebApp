@@ -7,17 +7,16 @@ const ChangePasswordModal = ({ closeModal }) => {
   const [error, setError] = useState("");
 
   const handleSave = () => {
+    const apiBaseUrl = import.meta.env.VITE_API_URL;
+    const path = "/profile/:userid";
+
     if (password !== confirmPassword) {
       setError("Passwords do not match");
       return;
     }
 
     axios
-      .put(
-        `http://localhost:3000/profile/:userid`,
-        { password },
-        { withCredentials: true }
-      )
+      .put(apiBaseUrl + path, { password }, { withCredentials: true })
       .then(() => {
         closeModal();
       })

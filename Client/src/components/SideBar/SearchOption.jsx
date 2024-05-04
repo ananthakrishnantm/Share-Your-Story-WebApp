@@ -11,21 +11,22 @@ const SearchOption = ({
   const [searchResults, setSearchResults] = useState([]);
   const [showDropdown, setShowDropdown] = useState(false);
   const dropdownRef = useRef(null);
+  const apiBaseUrl = import.meta.env.VITE_API_URL;
 
   useEffect(() => {
     setSearchResults([]); // Reset search results on each search query change
 
     const handleSearchCall = async () => {
+      const path = `/profile/data/search?username=${searchQuery}`;
+      const apiUrl = apiBaseUrl + path;
+
       if (!searchQuery) {
         setShowDropdown(false);
         return;
       }
 
       try {
-        const response = await axios.get(
-          `http://localhost:3000/profile/data/search?username=${searchQuery}`,
-          { withCredentials: true }
-        );
+        const response = await axios.get(apiUrl, { withCredentials: true });
         setSearchResults(response.data);
         setShowDropdown(true);
       } catch (error) {
@@ -89,7 +90,7 @@ const SearchOption = ({
                 className="px-3 py-2 flex items-center cursor-pointer hover:bg-gray-100"
               >
                 <Link
-                  to={`data/profile/${user._id}`} // Navigate to user profile page
+                  to={`data/profile/${user.username}`} // Navigate to user profile page
                   onClick={() => handleChange(user)} // Optionally handle selection
                   className="flex items-center"
                 >

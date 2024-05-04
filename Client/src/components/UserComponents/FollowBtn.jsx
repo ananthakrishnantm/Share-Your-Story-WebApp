@@ -8,17 +8,20 @@ import { mdiAccountPlus } from "@mdi/js";
 const FollowBtn = ({ userId }) => {
   const [currentUserData, setCurrentUserData] = useState(null);
   const [socket, setSocket] = useState(null);
+  const apiBaseUrl = import.meta.env.VITE_API_URL;
   console.log("this is the userID", userId);
   useEffect(() => {
     const fetchUserData = () => {
-      const apiUrl = `http://localhost:3000/profile/:userId`;
+      const path = `/profile/:userId`;
+
+      const apiUrl = apiBaseUrl + path;
       axios
         .get(apiUrl, { withCredentials: true })
         .then((response) => setCurrentUserData(response.data.data))
         .catch((error) => console.log(error));
     };
 
-    const socket = socketIOClient("http://localhost:3000");
+    const socket = socketIOClient(apiBaseUrl);
     socket.on("connect_error", (error) => {
       console.error("Socket connection error:", error);
     });
@@ -32,7 +35,8 @@ const FollowBtn = ({ userId }) => {
   }, []);
 
   const handleUnfollow = (userToUnFollowId) => {
-    const apiUrl = `http://localhost:3000/follower/blog/users/:userId/${userToUnFollowId}`;
+    const path = `/follower/blog/users/:userId/${userToUnFollowId}`;
+    const apiUrl = apiBaseUrl + path;
     axios
       .delete(apiUrl, {
         withCredentials: true,
@@ -49,7 +53,8 @@ const FollowBtn = ({ userId }) => {
   };
 
   const handleFollow = (userToFollowId) => {
-    const apiUrl = `http://localhost:3000/follower/blog/users/:userId/follow`;
+    const path = `/follower/blog/users/:userId/follow`;
+    const apiUrl = apiBaseUrl + path;
     axios
       .post(apiUrl, { userToFollowId }, { withCredentials: true })
       .then((response) => {

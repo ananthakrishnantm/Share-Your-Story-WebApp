@@ -10,14 +10,17 @@ export const UseAuthProvider = ({ children, protectedPaths }) => {
   const [loggedIn, setLoggedIn] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
+  const apiBaseUrl = import.meta.env.VITE_API_URL;
 
   //useLocation gets the current location.
 
   useEffect(() => {
+    const path = `/blog`;
+    const apiUrl = apiBaseUrl + path;
     // Check if the current path is in the list of protected paths
     if (protectedPaths.includes(location.pathname)) {
       axios
-        .get(`http://localhost:3000/blog`, { withCredentials: true })
+        .get(apiUrl, { withCredentials: true })
         .then((res) => {
           setLoggedIn(true);
         })

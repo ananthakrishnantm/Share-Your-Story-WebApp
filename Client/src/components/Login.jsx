@@ -8,16 +8,30 @@ import "./login.css";
 const Login = ({ setToken }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
   const navigate = useNavigate();
 
   const handleLogin = () => {
-    const socket = io("http://localhost:3000");
+    // Email format validation regex
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!email || !password) {
+      setError("Please enter both email and password.");
+      return;
+    }
+
+    if (!emailRegex.test(email)) {
+      setError("Please enter a valid email address.");
+      return;
+    }
+
+    const apiBaseUrl = import.meta.env.VITE_API_URL;
+    const path = "/login";
+
+    const apiUrl = apiBaseUrl + path;
+    const socket = io(apiBaseUrl);
     axios
-      .post(
-        "http://localhost:3000/login",
-        { email, password },
-        { withCredentials: true }
-      )
+      .post(apiUrl, { email, password }, { withCredentials: true })
       .then((res) => {
         // localStorage.setItem("token", token);
         socket.emit("checkUserOnline", res.data.userId);
@@ -25,16 +39,22 @@ const Login = ({ setToken }) => {
         console.log("logged in");
       })
       .catch((err) => {
-        console.log("incorrect password", err);
+        if (err.response && err.response.status === 401) {
+          setError("Incorrect email or password.");
+        } else {
+          setError("Wrong credentials. Please try again.");
+        }
       });
-
-    return;
   };
 
   return (
     <div className="flex items-center justify-center h-screen">
       <div className="bg-white rounded-lg p-8 shadow-md w-96">
         <h1 className="text-4xl font-bold mb-8 text-center">Login</h1>
+        <h1 className="text-4  mb-2 text-center">Alpha 1.0</h1>
+        <h1 className="text-2  text-center">*Under Development</h1>
+
+        {error && <div className="text-red-600 mb-4">{error}</div>}
 
         <div className="mb-8">
           <label className="block text-lg font-medium text-gray-600">
@@ -44,6 +64,7 @@ const Login = ({ setToken }) => {
             className="login-input-fields rounded-md w-full py-2 px-4 text-lg"
             type="text"
             name="email"
+            value={email}
             onChange={(e) => setEmail(e.target.value)}
           />
         </div>
@@ -55,6 +76,7 @@ const Login = ({ setToken }) => {
             className="login-input-fields rounded-md w-full py-2 px-4 text-lg"
             type="password"
             name="password"
+            value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
         </div>

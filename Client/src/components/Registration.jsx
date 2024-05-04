@@ -14,9 +14,31 @@ const Registration = () => {
   const navigate = useNavigate();
 
   const handleSubmitSignup = () => {
+    if (
+      !firstName ||
+      !lastName ||
+      !dateOfBirth ||
+      !username ||
+      !email ||
+      !password ||
+      !confirmPassword
+    ) {
+      alert("Please fill in all required fields.");
+      return;
+    }
+
+    if (!validateEmail(email)) {
+      alert("Please enter a valid email address.");
+      return;
+    }
+
+    const apiBaseUrl = import.meta.env.VITE_API_URL;
+    const path = `/signup`;
+    const apiUrl = apiBaseUrl + path;
+
     axios
       .post(
-        `http://localhost:3000/signup`,
+        apiUrl,
         {
           firstName,
           middleName,
@@ -34,6 +56,12 @@ const Registration = () => {
       .catch((err) => {
         console.log(err);
       });
+  };
+
+  const validateEmail = (email) => {
+    // Regular expression for email validation
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return regex.test(email);
   };
 
   return (
@@ -65,7 +93,7 @@ const Registration = () => {
             <label className="w-full mb-2">Middle Name:</label>
             <input
               type="text"
-              placeholder="Middle Name"
+              placeholder="Middle Name (optional)"
               value={middleName}
               onChange={(e) => setMiddleName(e.target.value)}
               className="border border-gray-300 rounded-md px-3 py-2 w-full"
