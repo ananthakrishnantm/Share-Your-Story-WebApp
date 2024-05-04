@@ -52,7 +52,7 @@ app.use(express.json());
 
 app.get("/", (req, res) => {
   console.log(req);
-  return response.status(234).send("its successful");
+  return res.status(234).send("its successful");
 });
 
 app.use("/api/profile", user);
