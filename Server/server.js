@@ -34,8 +34,8 @@ const io = new Server(server, {
     methods: ["GET", "POST"],
   },
 });
-const __dirname = path.resolve();
-app.use(express.static(path.join(__dirname, "../Client/dist")));
+// const __dirname = path.resolve();
+// app.use(express.static(path.join(__dirname, "../Client/dist")));
 
 // Attach the event listener using the imported SocketServer function
 io.on("connection", (socket) => {
@@ -70,9 +70,9 @@ app.use("/api/logout", logoutMethod);
 
 app.use("/api/follower", followerRoute);
 
-app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "../Client/dist", "index.html"));
-});
+// app.get("*", (req, res) => {
+//   res.sendFile(path.join(__dirname, "../Client/dist", "index.html"));
+// });
 
 //using sockets for blogs
 mongoose
