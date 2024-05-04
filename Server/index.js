@@ -4,7 +4,7 @@ import SocketServer from "./SocketServer.js"; // Import the SocketServer functio
 import { PORT, mongoDBURLS } from "./config.js";
 import mongoose from "mongoose";
 import { FoodBlog } from "./models/FoodBlogModel.js";
-import foodRouter from "../Server/routes/BlogDataRoutes.js";
+import foodRouter from "./routes/BlogDataRoutes.js";
 import registerRouter from "./routes/RegistrationRoute.js";
 import authRouter from "./routes/LoginRoutes.js";
 import cors from "cors";
