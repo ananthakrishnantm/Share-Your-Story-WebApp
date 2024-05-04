@@ -7,6 +7,7 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
+const { cookie_url } = process.env;
 const secretKey = process.env.JWT_SECRET_KEY;
 
 const authRouter = express.Router();
@@ -41,7 +42,7 @@ authRouter.post("/", async (request, response) => {
       httpOnly: true,
       sameSite: "strict",
       secure: true,
-      path: "/",
+      path: cookie_url,
     });
 
     return response.status(200).json({ message: "Login Successful", token });
