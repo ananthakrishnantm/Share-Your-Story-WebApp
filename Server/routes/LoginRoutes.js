@@ -40,7 +40,7 @@ authRouter.post("/", async (request, response) => {
     //cookie created here
     response.cookie("cookie", token, {
       httpOnly: true,
-      // sameSite: "strict",
+      sameSite: "None",
       secure: true,
       path: cookie_url,
     });
