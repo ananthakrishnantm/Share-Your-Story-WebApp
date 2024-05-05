@@ -42,7 +42,7 @@ authRouter.post("/", async (request, response) => {
       httpOnly: true,
       sameSite: "None",
       secure: true,
-      path: cookie_url,
+      path: "/",
     });
 
     return response.status(200).json({ message: "Login Successful", token });
