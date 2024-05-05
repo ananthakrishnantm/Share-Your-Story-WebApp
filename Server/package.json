@@ -8,8 +8,8 @@
     "//": "add start and dev start as extra for starting server and setting nodemon",
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node index.js",
-    "dev": "nodemon index.js",
-    "buildClient": "npm install --prefix ../Client && npm run build --prefix ../Client && npm install"
+    "dev": "npm install && nodemon index.js",
+    "buildClient": "cd ../Client &&  npm install && npm run build"
   },
   "keywords": [],
   "author": "",
