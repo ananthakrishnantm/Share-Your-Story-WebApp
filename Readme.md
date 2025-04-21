@@ -23,18 +23,6 @@ npm run dev
 
 This will start both the client-side and server-side applications.
 
-## 💡 Troubles Faced During Server Setup
-
-1. **Middleware Setup**: Initially forgot to configure middleware, which caused some delays in setting things up.
-2. **File Upload to MongoDB**: Struggled with understanding how to upload files to MongoDB.
-3. **Multer Configuration**:
-    - **memoryStorage**: Stores files as buffers (binary64-bit hexadecimal).
-    - **DiskStorage**: Stores files on the server and sends meta data to the database.
-4. **Multer Path Configuration**: 
-    - Found that Multer must be set to the initial path (`"/"`) for it to work with other paths (e.g., `"/:id"`) — a key issue when using Postman for form-data submissions.
-    - **Form-data**: Postman sends binary data, so the correct Multer path configuration is crucial for accepting form-data uploads.
-
-**Note**: Check out [Zustand](https://github.com/pmndrs/zustand) for state management.
 
 ## 📝 To-Do List
 
