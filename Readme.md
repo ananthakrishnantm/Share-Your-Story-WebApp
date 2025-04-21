@@ -1,72 +1,90 @@
-README :-
+# Blog Website - Development
 
-About :-
-This is a Blog webSite im developing locally right now.
+This is a **Blog Website** currently being developed locally. It features both **client-side** and **server-side** functionality, including **user authentication**.
 
-The project has both client and server with user authentication mechanism.
+The backend is connected to **MongoDB**, which is also set up locally for storing data.
 
-MongoDb has been setup locally for this.
+## 🚀 Features
 
-How to Run :-
+- **User Authentication**: User registration and login functionality.
+- **Post Creation**: Users can create blog posts.
+- **Comments & Likes**: Users can comment and like posts.
+- **Follow/Unfollow**: Users can follow/unfollow other users.
+- **Search**: Users can search by username or email.
+- **Responsive Design**: Fully responsive layout for optimal viewing on all devices.
 
-Use the command npm run dev to launch both the server and client.
+## ⚙️ How to Run
 
-Troubles faced during server setup :-
+To launch both the **server** and **client**, use the following command:
 
-1.  Forgot about middleware so spent some time over there.
-2.  Needed an idea on how to upload files to mongodb database.
-3.  Discovered about multer :-
-    1.  found out about memoryStorage and Diskstorage
-    2.  Diskstorage stores in servers send meta data to db
-    3.  memoryStorage stores data as binary64 bit hexadecimal value as buffers.
-4.  Multer was a pain in the ass, it had to be set to the initial path ie ("/") this
-    thing for it to take effect on all the other paths like ("/:id"),
-    hence put operation was not working when sending the data using postman through form-data.
-5.  Form-data in postman sends binary data, hence multer path is crucial for it to accept
-    throught Form-data.
+```bash
+npm run dev
+```
 
-\*\*check zustand.
+This will start both the client-side and server-side applications.
 
-To-Do-list
+## 💡 Troubles Faced During Server Setup
 
-Main :-
+1. **Middleware Setup**: Initially forgot to configure middleware, which caused some delays in setting things up.
+2. **File Upload to MongoDB**: Struggled with understanding how to upload files to MongoDB.
+3. **Multer Configuration**:
+    - **memoryStorage**: Stores files as buffers (binary64-bit hexadecimal).
+    - **DiskStorage**: Stores files on the server and sends meta data to the database.
+4. **Multer Path Configuration**: 
+    - Found that Multer must be set to the initial path (`"/"`) for it to work with other paths (e.g., `"/:id"`) — a key issue when using Postman for form-data submissions.
+    - **Form-data**: Postman sends binary data, so the correct Multer path configuration is crucial for accepting form-data uploads.
 
-!!!!!!IMPORTANT BUG
--Inifnite request from followerList and comment components.
+**Note**: Check out [Zustand](https://github.com/pmndrs/zustand) for state management.
 
-2.  add comment and likes
-3.  search option - to find username/emailid.
-4.  see more if theres big paras a in post.
+## 📝 To-Do List
 
-Done:-
+### 🔧 Important Bugs
 
-1.  Update follow,unfollow state
-2.  add follower list-next
+- **Infinite Requests**: Infinite request loop issue in **follower list** and **comment components**.
 
-3.  Creating a Nav bar
-    Future updates
-    -Explore and see others blog
-    -Category
-    -trending authors recomendation.
-    -recomended blogs - which are trending.
+### ✨ Features to Implement
 
-4.  onCLick blog Views blog in a card popup window its called (modal)
+1. **Add Comments and Likes** to posts.
+2. **Search Functionality** to search by **username** or **email**.
+3. **Pagination/Expand Text**: Implement a "See More" feature for longer post paragraphs.
+4. **Fix Infinite Request Bug** from follower list and comment components.
 
-    //issue to check -> in paths with /:id if cookies deleted it dsnt lead to the login page
+### ✅ Done
 
-5.  user need to show all users- create a new backend api endpoint for all users so that individual users profile pic can be shown.
-    last. age should be 18+ to register check with dob (do this last dnt forget dumbass) .
+1. **Follow/Unfollow State**: Updated the state of following/unfollowing a user.
+2. **Follower List Pagination**: Implemented "next" feature for displaying followers.
+3. **Navbar**: Created a navigation bar.
+   - Future updates: 
+     - Explore and view other users' blogs.
+     - Categorize blogs.
+     - Trending authors and recommended blogs.
+4. **Modal**: On-click blog opens in a **card popup window** (modal).
 
-6.  updating the state of followed and follower number in profile section.//least prio
+### 🔧 Pending Issues
 
-Comment Input
--> Input Field->Enter the data->press enter ->send button
-->sends the data
-->edit option (edited)
-->label to an input field  
-->Comment will be displated as a label
+- **Path Issue**: In routes with `/id`, if cookies are deleted, it doesn't redirect to the login page.
+- **User Profile Display**: Need to create an API endpoint to fetch all users' profile pictures.
+- **Age Validation**: Ensure that users must be 18+ to register by checking their **date of birth**. (This is a lower priority.)
 
--seperate api call
+### 📝 Comment Input Flow
 
-To-Look at stuff
--NExtAUth and Auth0
+1. **Input Field**: User enters comment text and presses **Enter** or clicks the **Send** button.
+2. **Edit Option**: Allow editing of comments after submission.
+3. **Comment Display**: Show comment as a label once submitted.
+
+### 🔧 Separate API Call
+
+- Implement a separate API call for handling comment data.
+
+## 🛠️ Technologies Used
+
+- **Backend**: Node.js, Express
+- **Database**: MongoDB
+- **File Upload**: Multer
+- **Frontend**: React.js
+- **State Management**: Zustand (currently considering integration)
+- **Authentication**: JWT (JSON Web Tokens)
+
+## 🧑‍💻 Future Improvements
+
+- Explore **NextAuth.js** and **Auth0** for authentication.
