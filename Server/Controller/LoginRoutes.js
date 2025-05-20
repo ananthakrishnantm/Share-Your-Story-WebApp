@@ -10,6 +10,7 @@ dotenv.config();
 
 const secretKey = process.env.JWT_SECRET_KEY;
 const successRedirectLink = process.env.origin_Link;
+console.log(process.env.ORIGIN_LINK);
 const authRouter = express.Router();
 
 // Normal login
