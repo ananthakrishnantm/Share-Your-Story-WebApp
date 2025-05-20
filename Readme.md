@@ -34,9 +34,9 @@ Main :-
 !!!!!!IMPORTANT BUG
 -Inifnite request from followerList and comment components.
 
-2.  add comment and likes
-3.  search option - to find username/emailid.
-4.  see more if theres big paras a in post.
+1. adding word limit to everything.
+2. suggetions need to be fixed(if a follower follows sm1 then he can be used as a suggetion for the other person).
+3. adding a limit to number of sugetions(4 suggetions max)/it should also be in rotation (also if sm1 already follows sm1 it shouldnt be)
 
 Done:-
 
@@ -59,14 +59,39 @@ Done:-
 
 6.  updating the state of followed and follower number in profile section.//least prio
 
-Comment Input
--> Input Field->Enter the data->press enter ->send button
-->sends the data
-->edit option (edited)
-->label to an input field  
-->Comment will be displated as a label
+7.  add comment and likes
+8.  search option - to find username/emailid.
 
 -seperate api call
-
 To-Look at stuff
--NExtAUth and Auth0
+
+-adding a filter for new and hottest posts.
+-Proxy middleware
+
+video things to do :-
+
+1. profile pic generator.
+2. adding node mailer to add email verification to account.
+3. make a video on infinite scroll.
+
+For Tomorrow :-
+
+1.recomended followers
+2.add view profile option for recomended followers.
+
+imp:-
+add following list too dont forget dumbass...
+
+For suggested users
+-> A Follows B, B Follows C Suggest C To A.
+-> mutual interests - ask the users for their interests - add some interests
+
+
+report system :-
+when clicking on report bring two options, report or block
+
+
+
+
+Trending section
+weighted system based on likes, views and comments.

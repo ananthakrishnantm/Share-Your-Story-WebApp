@@ -1,61 +1,62 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useRef } from "react";
 import axios from "axios";
 import { Buffer } from "buffer";
-import { Link, useNavigate, useParams } from "react-router-dom";
-import MDEditor from "@uiw/react-md-editor";
+import { Link, useNavigate } from "react-router-dom";
 import { LikeUnlikeComponent } from "./UserComponents/LikeUnlikeComponent";
-import CommentSection from "./UserComponents/CommentSection";
+import DisplayComments from "./CommentComponents/DisplayComments";
+import BlockBtn from "./UserComponents/BlockBtn";
+import MoreBtn from "./SideBar/MoreBtn";
+import ViewCountComponent from "./CommentComponents/ViewCountComponent";
 
 const AllUserBlogs = ({ triggerFetch }) => {
-  const [blog, setBlog] = useState([]);
-  const [profilePics, setProfilePics] = useState([]);
+  const [blogs, setBlogs] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [offset, setOffset] = useState(0);
+  const limit = 5; // Fixed limit
+  const observer = useRef(null);
+  const sentinelRef = useRef();
   const navigate = useNavigate();
-  const { id } = useParams();
+
   const apiBaseUrl = import.meta.env.VITE_API_URL;
 
-  // Callback functions using useCallback
   const fetchData = useCallback(async () => {
-    const path = "/blog";
+    if (loading) return;
+    setLoading(true);
+
+    const path = `/blog?offset=${offset}&limit=${limit}`;
+    const mainUrl = apiBaseUrl + path;
+
     try {
-      const response = await axios.get(apiBaseUrl + path, {
-        withCredentials: true,
-      });
+      const response = await axios.get(mainUrl, { withCredentials: true });
 
-      const sortedBlogs = response.data.data.sort(
-        (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-      );
-      setBlog(sortedBlogs);
+      // console.log(response);
 
-      // Fetch profile pictures for each user
-      const userIDs = sortedBlogs.map((blog) => blog.user);
-      fetchProfilePics(userIDs);
+      setBlogs((prevBlogs) => [...prevBlogs, ...response.data.data.blogs]);
+      setOffset((prevOffset) => prevOffset + limit);
+
+      setLoading(false);
     } catch (error) {
       console.log(error);
     }
-  }, []);
+  }, [loading, limit, offset, apiBaseUrl]);
 
-  const fetchProfilePics = useCallback(async (userIDs) => {
-    const path = `/profile/blog/${userID}`;
-    const apiUrl = apiBaseUrl + path;
-    try {
-      const promises = userIDs.map((userID) =>
-        axios.get(apiUrl, {
-          withCredentials: true,
-        })
-      );
+  useEffect(() => {
+    if (observer.current) observer.current.disconnect();
 
-      const responses = await Promise.all(promises);
-      const profilePicMap = {};
+    observer.current = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting) {
+        fetchData();
+      }
+    });
 
-      responses.forEach((response) => {
-        profilePicMap[response.data._id] = response.data;
-      });
-
-      setProfilePics(profilePicMap);
-    } catch (error) {
-      console.log(error);
+    if (sentinelRef.current) {
+      observer.current.observe(sentinelRef.current);
     }
-  }, []);
+
+    return () => {
+      if (observer.current) observer.current.disconnect();
+    };
+  }, [fetchData, triggerFetch]);
 
   const formatDate = useCallback((timeStamp) => {
     const options = {
@@ -68,73 +69,85 @@ const AllUserBlogs = ({ triggerFetch }) => {
     return new Date(timeStamp).toLocaleString("en-US", options);
   }, []);
 
-  useEffect(() => {
-    fetchData();
-  }, [fetchData, triggerFetch]);
+  // console.log("this is the all data", blogs);
 
   return (
-    <div>
-      <div className="flex justify-center text-black mb-5 "></div>
-      {blog.map((data, index) => (
-        <div key={index}>
-          <div className="max-w-3xl mx-auto mb-1 ">
-            <div className="bg-white rounded-md  overflow-hidden shadow-custom ">
-              {data.image && (
-                <img
-                  className="w-full h-32 object-cover object-center"
-                  src={`data:${data.image.contentType};base64,${Buffer.from(
-                    data.image.data.data
-                  ).toString("base64")}`}
-                  alt={data.title}
-                />
-              )}
-              {/*this is the second section*/}
-              <div className="ml-50vh   flex ">
-                <div className="px-6 py-4 flex flex-1 flex-col ">
-                  {profilePics[data.user] &&
-                    profilePics[data.user].profilePicture && (
-                      <div className="flex justify-between items-center w-full ">
-                        <div>
-                          <Link
-                            to={`/home/${profilePics[data.user]._id}/blogs`}
-                          >
-                            <h1 className="px-5 font-bold text-base text-gray-700 sm:text-lg md:text-xl lg:text-2xl xl:text-3xl">
-                              @{profilePics[data.user].username}
-                            </h1>
-                          </Link>
-                        </div>
-                        <div>
-                          <img
-                            className="w-16 h-16 m-5 rounded-full"
-                            src={`data:${
-                              profilePics[data.user].profilePicture.contentType
-                            };base64,${Buffer.from(
-                              profilePics[data.user].profilePicture.data.data
-                            ).toString("base64")}`}
-                            alt={profilePics[data.user].username}
-                          />
-                        </div>
+    <div className="flex-1 mt-16 md:ml-36 lg:ml-48 xl:ml-48 ml-auto mr-1">
+      {blogs.map((data) => (
+        <div key={data._id} className="max-w-3xl mx-auto mb-1">
+          <div
+            className="bg-white rounded-md  shadow-custom"
+            onClick={() => navigate(`/home/${data.user}/blogs/${data._id}`)}
+          >
+            {data.image && (
+              <img
+                className="w-full h-32 object-cover object-center"
+                src={`data:${data.image.contentType};base64,${Buffer.from(
+                  data.image.data.data
+                ).toString("base64")}`}
+                alt={data.title}
+              />
+            )}
+            <div className="ml-50vh flex">
+              <div className="px-6  flex flex-1 flex-col">
+                {data.userDetails && data.userDetails.profilePicture && (
+                  <div className="flex items-center w-full">
+                    <div>
+                      <img
+                        className="w-12 h-12 sm:w-16 sm:h-16  m-5 rounded-full"
+                        src={`data:${data.userDetails.profilePicture.contentType};base64,${data.userDetails.profilePicture.data}`}
+                        alt={data.userDetails.profilePicture.username}
+                      />
+                    </div>
+                    <div onClick={(e) => e.stopPropagation()}>
+                      <Link to={`/home/${data.user}/blogs`}>
+                        <h1 className="text-sm  font-bold text-gray-700 sm:text-lg md:text-xl  ">
+                          {data.userDetails.username}
+                        </h1>
+                      </Link>
+                    </div>
+                  </div>
+                )}
+                <div className="mb-10">
+                  <h1 className="font-bold text-base sm:text-lg md:text-xl lg:text-2xl xl:text-3xl">
+                    {data.title}
+                  </h1>
+                </div>
+                <div>
+                  <p
+                    style={{ whiteSpace: "pre-wrap" }}
+                    className="text-black text-base mb-5"
+                  >
+                    {data.content}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-gray-600 text-base mb-5">
+                    Created on: {formatDate(data.createdAt)}
+                  </p>
+                  <div>
+                    <div className="flex gap-8 mb-4">
+                      <div onClick={(e) => e.stopPropagation()}>
+                        <LikeUnlikeComponent blogId={data._id} />
                       </div>
-                    )}
-
-                  <div className="mb-10">
-                    <h1 className="font-bold text-base sm:text-lg md:text-xl lg:text-2xl xl:text-3xl mb-5">
-                      {data.title}
-                    </h1>
-                  </div>
-                  <div>
-                    <MDEditor.Markdown
-                      source={data.content}
-                      style={{ whiteSpace: "pre-wrap" }}
-                      className="text-black text-base sm:text-lg md:text-xl lg:text-2xl xl:text-3xl mb-20"
-                    />
-                  </div>
-                  <div>
-                    <p className="text-gray-600 md:text-lg mb-5">
-                      Created on: {formatDate(data.createdAt)}
-                    </p>
-                    <LikeUnlikeComponent blogId={data._id} />
-                    <CommentSection blogId={data._id} />
+                      <div>
+                        <DisplayComments blogId={data._id} userId={data.user} />
+                      </div>
+                      <div>
+                        <p>
+                          <ViewCountComponent blogId={data._id} />
+                        </p>
+                      </div>
+                      <div
+                        onClick={(e) => e.stopPropagation()}
+                        className="relative overflow-visible"
+                      >
+                        <MoreBtn userId={data.user} blogId={data._id} />
+                      </div>
+                    </div>
+                    {/* <div>
+                      <CommentSection blogId={data._id} />
+                    </div> */}
                   </div>
                 </div>
               </div>
@@ -142,6 +155,10 @@ const AllUserBlogs = ({ triggerFetch }) => {
           </div>
         </div>
       ))}
+      {/*the height is important for this as intersection observer needs a dimension to detect so add a height or margin or even border*/}
+      <div ref={sentinelRef} className="flex justify-center h-10 text-white">
+        {loading && <p>Loading...</p>}
+      </div>
     </div>
   );
 };

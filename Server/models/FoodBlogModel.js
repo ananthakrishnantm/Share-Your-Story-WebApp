@@ -64,6 +64,13 @@ const foodBlogSchema = mongoose.Schema(
       type: Number,
       default: 0,
     },
+    views: [
+      {
+        userId: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+        timestamp: { type: Date, default: Date.now },
+      },
+    ],
+    uniqueViews: { type: Number, default: 0 },
   },
 
   {

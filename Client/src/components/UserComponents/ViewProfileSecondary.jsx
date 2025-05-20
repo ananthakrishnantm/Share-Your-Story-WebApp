@@ -1,11 +1,9 @@
 import React, { useEffect, useState } from "react";
-import Container from "@mui/material/Container";
 import Avatar from "@mui/material/Avatar";
 import Typography from "@mui/material/Typography";
-import Button from "@mui/material/Button";
-import Box from "@mui/material/Box";
 import axios from "axios";
 import { Buffer } from "buffer";
+import { Link } from "react-router-dom";
 
 function ViewProfileSecondary() {
   const [data, setData] = useState([]);
@@ -29,94 +27,77 @@ function ViewProfileSecondary() {
     };
     profilePictureData();
   }, []);
+  // console.log(data);
 
   return (
-    <Container
-      component="main"
-      maxWidth="xs"
-      style={{
-        backgroundColor: "white",
-        border: "1px solid #ccc",
-        borderRadius: "5px",
-        padding: "20px",
-      }}
-    >
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          textAlign: "center",
-          marginTop: "20px",
-          marginBottom: "10px",
-        }}
-      >
-        <Avatar
-          alt="User Avatar"
-          sx={{ width: 120, height: 120, marginBottom: 2 }}
-        >
-          {data.profilePicture && (
-            <img
-              style={{ width: "100%", height: "100%", objectFit: "cover" }}
-              src={`data:${
-                data.profilePicture.contentType
-              };base64,${Buffer.from(data.profilePicture.data.data).toString(
-                "base64"
-              )}`}
-              alt={data.title}
-            />
-          )}
-        </Avatar>
-        <Typography
-          component="h1"
-          variant="h5"
-          gutterBottom
-          style={{ fontSize: "24px" }}
-        >
-          {data.username}
-        </Typography>
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            margin: "15px",
-            marginBottom: "25px",
-            backgroundColor: "#f0f0f0",
-            borderRadius: "10px",
-            padding: "20px",
-          }}
-        >
-          <Typography
-            component="p"
-            variant="body1"
-            style={{ fontSize: "16px", marginRight: "10px" }}
+    <div className="mt-10">
+      <div className="bg-neutral-900 p-5 rounded-lg outline outline-1 outline-white/10">
+        <div className=" flex flex-col items-center text-center mt-5 mb-2">
+          <Avatar
+            alt="User Avatar"
+            sx={{ width: 120, height: 120, marginBottom: 2 }}
           >
-            <strong>{data.following ? data.following.length : 0}</strong> <br />
-            Following:
-          </Typography>
+            {data.profilePicture && (
+              <img
+                style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                src={`data:${
+                  data.profilePicture.contentType
+                };base64,${Buffer.from(data.profilePicture.data.data).toString(
+                  "base64"
+                )}`}
+                alt={data.title}
+              />
+            )}
+          </Avatar>
+          <h5
+            className="text-xl font-bold text-white p-5"
+            style={{ fontSize: "24px" }}
+          >
+            {data.username}
+          </h5>
+          {/* {all the stuff is inside} */}
+          <div className="flex justify-center m-4 mb-6 bg-white rounded-lg p-5">
+            <Link to="/home/followinglist">
+              <div className="hover:bg-slate-200 p-2 rounded-lg flex justify-center items-center h-16">
+                <p className="text-base text-center">
+                  <strong>{data.following ? data.following.length : 0}</strong>
+                  <br />
+                  Following
+                </p>
+              </div>
+            </Link>
+            <Link to="/home/followerlist">
+              <div className="hover:bg-slate-200 p-2 rounded-lg flex justify-center items-center h-16">
+                <p className="text-base text-center">
+                  <strong>{data.followers ? data.followers.length : 0}</strong>{" "}
+                  <br />
+                  Followers
+                </p>
+              </div>
+            </Link>
+            <Link to="/home/userId">
+              <div className="hover:bg-slate-200 p-2 rounded-lg flex justify-center items-center h-16">
+                <p className="text-base text-center">
+                  <strong> {data.blogCount ? data.blogCount : 0} </strong>{" "}
+                  <br /> Posts
+                </p>
+              </div>
+            </Link>
+          </div>
 
-          <Typography
-            component="p"
-            variant="body1"
-            style={{ fontSize: "16px", marginRight: "10px" }}
-          >
-            <strong>{data.followers ? data.followers.length : 0}</strong> <br />
-            Followers:
-          </Typography>
-          <Typography
-            component="p"
-            variant="body1"
-            style={{ fontSize: "16px" }}
-          >
-            <strong> 100 </strong>
-            <br /> Posts:
-          </Typography>
+          <div>
+            <Link to={"/profile/:userId"} className="block">
+              <div
+                className=" text-white px-4 py-2 rounded-xl transition duration-300 hover:scale-105 rounded-t-xl"
+                style={{ outline: "1px solid rgba(255, 255, 255, 0.1)" }}
+              >
+                Profile
+              </div>
+            </Link>
+          </div>
         </div>
-        <Button variant="contained" color="primary">
-          View Profile
-        </Button>
       </div>
-    </Container>
+    </div>
   );
 }
 

@@ -3,7 +3,6 @@ import React, { useState, useEffect, useReducer } from "react";
 import { useNavigate } from "react-router-dom";
 import "./Upload.css";
 import { AiOutlineUpload } from "react-icons/ai";
-import MDEditor from "@uiw/react-md-editor";
 
 const Upload = ({ updateBlogList }) => {
   const [title, setTitle] = useState("");
@@ -33,7 +32,6 @@ const Upload = ({ updateBlogList }) => {
         const blogArray = [response.data];
 
         updateBlogList();
-        navigate("/home");
       })
       .catch((error) => {
         console.log(error);
@@ -45,44 +43,54 @@ const Upload = ({ updateBlogList }) => {
   };
 
   return (
-    <div className="bg-white rounded-md max-w-3xl mx-auto mb-4 overflow-hidden shadow-custom px-6 py-4">
-      <h1 className="font-bold  text-base sm:text-lg md:text-xl lg:text-2xl xl:text-3xl mb-2 text-black">
-        Create New Blog
-      </h1>
-      <div className="flex flex-col">
-        <input
-          type="text"
-          placeholder="Blog Title"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          className="w-full p-2 mb-2 border rounded-md upload-input-fields"
-        />
-        <MDEditor
-          value={content}
-          onChange={setContent}
-          className="w-full p-2 border rounded-md upload-input-fields"
-        />
-      </div>
-      <div className="flex justify-between mt-2">
-        <div>
-          <label htmlFor="file-input">
-            <AiOutlineUpload className="w-8 h-8  imageColor" />
-          </label>
+    <div
+      className="flex-1 xl:ml-48  md:mr-auto lg:ml-48 md:ml-36 lg:mt-5 "
+      // style={{ marginLeft: "165px", marginRight: "1px" }}
+    >
+      <div
+        className="bg-neutral-950 rounded-md max-w-3xl mx-auto mb-4  overflow-hidden shadow-custom px-6 py-4 "
+        style={{ outline: "1px solid rgba(255, 255, 255, 0.1)" }}
+      >
+        <div className="flex flex-col">
           <input
-            id="file-input"
-            className="hidden"
-            type="file"
-            accept="*"
-            onChange={handleImageChange}
+            type="text"
+            placeholder="Blog Title"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            className="w-full p-2 mb-2 border-0  outline-none rounded-md upload-input-fields bg-zinc-800 text-white"
+          />
+          <textarea
+            type="text"
+            placeholder="Write here.."
+            value={content}
+            // onChange={setContent}
+            onChange={(e) => setContent(e.target.value)}
+            className="textarea textarea-bordered w-full p-2 border-0  outline-none bg-black rounded-md upload-input-fields text-white"
+            style={{ maxHeight: "200px", minHeight: "100px", resize: "none" }}
           />
         </div>
-        <div>
-          <button
-            className="bg-gray-500 text-sm rounded-full p-2 text-white hover:bg-gray-700"
-            onClick={handleCreateBlog}
-          >
-            Publish Blog
-          </button>
+        <div className="flex justify-between mt-4">
+          <div>
+            <label htmlFor="file-input">
+              <AiOutlineUpload className="w-8 h-8  imageColor" />
+            </label>
+            <input
+              id="file-input"
+              className="hidden"
+              type="file"
+              accept="*"
+              onChange={handleImageChange}
+            />
+          </div>
+          <div>
+            <button
+              className="inline-flex items-center py-2 px-8 bg-black-700 text-sm w-full  rounded-md font-bold text-white  hover:text-gray-800"
+              style={{ outline: "1px solid rgba(255, 255, 255, 0.1)" }}
+              onClick={handleCreateBlog}
+            >
+              Post
+            </button>
+          </div>
         </div>
       </div>
     </div>

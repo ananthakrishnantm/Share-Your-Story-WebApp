@@ -1,16 +1,25 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import socketIOClient from "socket.io-client";
-import Button from "@mui/material/Button";
-import Icon from "@mdi/react";
-import { mdiAccountPlus } from "@mdi/js";
+import { UseAuth } from "../GlobalStateMangement/UseAuthProvider";
 
 const FollowBtn = ({ userId }) => {
   const [currentUserData, setCurrentUserData] = useState(null);
   const [socket, setSocket] = useState(null);
   const apiBaseUrl = import.meta.env.VITE_API_URL;
-  console.log("this is the userID", userId);
+
+  const { loggedInUserId } = UseAuth();
+
+  // console.log("this is the userID", userId);
+
   useEffect(() => {
+    // const socketLink = socketIOClient(apiBaseUrl);
+    // setSocket(socketLink);
+
+    // socketLink.on("connect_error", (error) => {
+    //   console.error("Socket connection error:", error);
+    // });
+
     const fetchUserData = () => {
       const path = `/profile/:userId`;
 
@@ -21,18 +30,16 @@ const FollowBtn = ({ userId }) => {
         .catch((error) => console.log(error));
     };
 
-    const socket = socketIOClient(apiBaseUrl);
-    socket.on("connect_error", (error) => {
-      console.error("Socket connection error:", error);
-    });
-    setSocket(socket);
+    // console.log("this is the socket", socketLink);
 
     fetchUserData();
 
-    return () => {
-      socket.disconnect();
-    };
-  }, []);
+    // return () => {
+    //   if (socketLink) {
+    //     return socketLink.disconnect();
+    //   }
+    // };
+  }, [apiBaseUrl, userId]);
 
   const handleUnfollow = (userToUnFollowId) => {
     const path = `/follower/blog/users/:userId/${userToUnFollowId}`;
@@ -69,32 +76,29 @@ const FollowBtn = ({ userId }) => {
   if (!currentUserData) {
     return null; // Or loading indicator
   }
+  const isFollowing = currentUserData.following.includes(userId);
+  const isCurrentUser = userId === loggedInUserId;
 
-  console.log(currentUserData);
+  // console.log(currentUserData);
 
   return (
     <div>
-      {currentUserData.following.includes(userId) ? (
-        <Button
-          style={{ color: "#8bc34a" }}
-          variant="outlined"
-          disableElevation
-          endIcon={<Icon path={mdiAccountPlus} size={1} />}
-          onClick={() => handleUnfollow(userId)}
-        >
-          Unfollow
-        </Button>
-      ) : (
-        <Button
-          style={{ color: "#8bc34a" }}
-          variant="outlined"
-          disableElevation
-          endIcon={<Icon path={mdiAccountPlus} size={1} />}
-          onClick={() => handleFollow(userId)}
-        >
-          Follow
-        </Button>
-      )}
+      {!isCurrentUser &&
+        (isFollowing ? (
+          <button
+           
+            onClick={() => handleUnfollow(userId)}
+          >
+            Unfollow
+          </button>
+        ) : (
+          <button
+           
+            onClick={() => handleFollow(userId)}
+          >
+            Follow
+          </button>
+        ))}
     </div>
   );
 };

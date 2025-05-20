@@ -1,272 +1,99 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { Link, useNavigate } from "react-router-dom";
-import { Buffer } from "buffer";
-import { styled, alpha } from "@mui/material/styles";
-import AppBar from "@mui/material/AppBar";
-import Box from "@mui/material/Box";
-import Toolbar from "@mui/material/Toolbar";
-import IconButton from "@mui/material/IconButton";
-import Typography from "@mui/material/Typography";
-import Badge from "@mui/material/Badge";
-import Menu from "@mui/material/Menu";
-import MenuItem from "@mui/material/MenuItem";
-import MailIcon from "@mui/icons-material/Mail";
-import NotificationsIcon from "@mui/icons-material/Notifications";
-import MoreIcon from "@mui/icons-material/MoreVert";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import SearchOption from "./SideBar/SearchOption";
 
-// Import React dummy image
-import { Avatar as DummyAvatar } from "@mui/material";
-
-const Search = styled("div")(({ theme }) => ({
-  position: "relative",
-  borderRadius: theme.shape.borderRadius,
-  backgroundColor: alpha(theme.palette.common.white, 0.15),
-  "&:hover": {
-    backgroundColor: alpha(theme.palette.common.white, 0.25),
-  },
-  marginRight: theme.spacing(2),
-  marginLeft: 0,
-  width: "100%",
-  [theme.breakpoints.up("sm")]: {
-    marginLeft: theme.spacing(3),
-    width: "auto",
-  },
-}));
-
-const PrimarySearchAppBar = () => {
-  const [anchorEl, setAnchorEl] = useState(null);
-  const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = useState(null);
+const Navbar = () => {
   const [profile, setProfile] = useState("");
-  const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
-
-  const handleSearchInputChange = (e) => {
-    setSearchQuery(e.target.value);
-  };
+  const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
-    const apiBaseUrl = import.meta.env.VITE_API_URL;
-    const path = "/profile/:userid";
-    const apiUrl = apiBaseUrl + path;
-    console.log("api Url", apiUrl);
-    axios
-      .get(apiUrl, { withCredentials: true })
-      .then((response) => {
+    const fetchProfile = async () => {
+      const apiBaseUrl = import.meta.env.VITE_API_URL;
+      const path = "/profile/:userid";
+      const apiUrl = apiBaseUrl + path;
+
+      try {
+        const response = await axios.get(apiUrl, { withCredentials: true });
         setProfile(response.data.data);
-      })
-      .catch((error) => {
+      } catch (error) {
         console.log(error);
-      });
+      }
+    };
+    fetchProfile();
   }, []);
 
-  const handleSearchIconClick = () => {
-    navigate(`/searchresults/${searchQuery}`);
+  const handleNavigation = (path) => {
+    navigate(path);
   };
-
-  const handleProfileMenuOpen = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
-
-  const handleMobileMenuClose = () => {
-    setMobileMoreAnchorEl(null);
-  };
-
-  const handleMenuClose = () => {
-    setAnchorEl(null);
-    handleMobileMenuClose();
-  };
-
-  const handleMobileMenuOpen = (event) => {
-    setMobileMoreAnchorEl(event.currentTarget);
-  };
-
-  const menuId = "primary-search-account-menu";
-  const renderMenu = (
-    <Menu
-      anchorEl={anchorEl}
-      anchorOrigin={{
-        vertical: "top",
-        horizontal: "right",
-      }}
-      id={menuId}
-      keepMounted
-      transformOrigin={{
-        vertical: "top",
-        horizontal: "right",
-      }}
-      open={Boolean(anchorEl)}
-      onClose={handleMenuClose}
-    >
-      <MenuItem onClick={handleMenuClose}>
-        <Link to={`/profile/:userId`}>Profile</Link>
-      </MenuItem>
-      <MenuItem onClick={handleMenuClose}>My account</MenuItem>
-    </Menu>
-  );
-
-  const mobileMenuId = "primary-search-account-menu-mobile";
-  const renderMobileMenu = (
-    <Menu
-      anchorEl={mobileMoreAnchorEl}
-      anchorOrigin={{
-        vertical: "top",
-        horizontal: "right",
-      }}
-      id={mobileMenuId}
-      keepMounted
-      transformOrigin={{
-        vertical: "top",
-        horizontal: "right",
-      }}
-      open={Boolean(mobileMoreAnchorEl)}
-      onClose={handleMobileMenuClose}
-    >
-      <MenuItem>
-        <IconButton size="large" aria-label="show 4 new mails" color="inherit">
-          <Badge badgeContent={4} color="error">
-            <MailIcon />
-          </Badge>
-        </IconButton>
-        <p>Messages</p>
-      </MenuItem>
-      <MenuItem>
-        <IconButton size="large" aria-label="show 4 new mails" color="inherit">
-          <Badge badgeContent={4} color="error">
-            <MailIcon />
-          </Badge>
-        </IconButton>
-        <p>Home</p>
-      </MenuItem>
-      <MenuItem>
-        <IconButton
-          size="large"
-          aria-label="show 17 new notifications"
-          color="inherit"
-        >
-          <Badge badgeContent={17} color="error">
-            <NotificationsIcon />
-          </Badge>
-        </IconButton>
-        <p>Notifications</p>
-      </MenuItem>
-      <MenuItem onClick={handleProfileMenuOpen}>
-        <IconButton
-          size="large"
-          aria-label="account of current user"
-          aria-controls="primary-search-account-menu"
-          aria-haspopup="true"
-          color="inherit"
-        >
-          {profile.profilePicture ? (
-            <img
-              className=" w-10 h-10 object-cover object-center rounded-full"
-              src={`data:${
-                profile.profilePicture.contentType
-              };base64,${Buffer.from(profile.profilePicture.data.data).toString(
-                "base64"
-              )}`}
-              alt={profile.title}
-            />
-          ) : (
-            <DummyAvatar
-              className=" w-10 h-10 object-cover object-center rounded-full"
-              alt="Dummy Image"
-            />
-          )}
-        </IconButton>
-        <Link to={`/profile/:userId`}>
-          <p>Profile</p>
-        </Link>
-      </MenuItem>
-    </Menu>
-  );
 
   return (
-    <Box sx={{ flexGrow: 1 }}>
-      <AppBar position="static">
-        <Toolbar>
-          <Link to="/home">
-            <Typography
-              variant="h6"
-              noWrap
-              component="div"
-              sx={{ display: { xs: "none", sm: "block" } }}
+    <div
+      className="text-gray-600 body-font bg-neutral-950 fixed w-full top-0"
+      style={{ outline: "1px solid rgba(255, 255, 255, 0.1)" }}
+    >
+      <div className="container mx-auto flex flex-wrap p-5 flex-col md:flex-row items-center">
+        <Link
+          to="/home"
+          className="flex title-font font-medium items-center text-gray-900 mb-4 md:mb-0"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            stroke="currentColor"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="2"
+            className="w-10 h-10 text-white p-2 bg-indigo-500 rounded-full"
+            viewBox="0 0 24 24"
+          >
+            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
+          </svg>
+          <span className="ml-3 text-xl text-zinc-50">Tailblocks</span>
+        </Link>
+        <nav
+          className=" hidden sm-tab:hidden  sm:hidden md:flex md:ml-auto md:mr-auto  flex-wrap items-center text-base justify-center bg-neutral-900 px-2 py-1 rounded-xl"
+          style={{ outline: "1px solid rgba(255, 255, 255, 0.2)" }}
+        >
+          <div
+            className={`px-4 py-2 rounded-xl text-center transition duration-300 ease-in-out ${
+              location.pathname.startsWith("/home") &&
+              !location.pathname.startsWith("/home/following")
+                ? "bg-neutral-500"
+                : ""
+            }`}
+          >
+            <button
+              className="text-zinc-50 hover:text-gray-400"
+              onClick={() => handleNavigation("/home")}
             >
-              Logo
-            </Typography>
-          </Link>
-          <SearchOption
-            searchQuery={searchQuery}
-            handleSearchInputChange={handleSearchInputChange}
-            handleSearchIconClick={handleSearchIconClick}
-          />
-          <Box sx={{ flexGrow: 1 }} />
-          <Box sx={{ display: { xs: "none", md: "flex" } }}>
-            <IconButton
-              size="large"
-              aria-label="show 4 new mails"
-              color="inherit"
+              All
+            </button>
+          </div>
+          <div
+            className={`px-4 py-2 rounded-xl text-center transition duration-300 ease-in-out ${
+              location.pathname.startsWith("/home/following")
+                ? "bg-neutral-500"
+                : ""
+            }`}
+          >
+            <button
+              className="text-zinc-50 hover:text-gray-400"
+              onClick={() => handleNavigation("/home/following")}
             >
-              <Badge badgeContent={4} color="error">
-                <MailIcon />
-              </Badge>
-            </IconButton>
-            <IconButton
-              size="large"
-              aria-label="show 17 new notifications"
-              color="inherit"
-            >
-              <Badge badgeContent={17} color="error">
-                <NotificationsIcon />
-              </Badge>
-            </IconButton>
-            <IconButton
-              size="large"
-              edge="end"
-              aria-label="account of current user"
-              aria-controls={menuId}
-              aria-haspopup="true"
-              onClick={handleProfileMenuOpen}
-              color="inherit"
-            >
-              {profile.profilePicture ? (
-                <img
-                  className=" w-10 h-10 object-cover object-center rounded-full"
-                  src={`data:${
-                    profile.profilePicture.contentType
-                  };base64,${Buffer.from(
-                    profile.profilePicture.data.data
-                  ).toString("base64")}`}
-                  alt={profile.title}
-                />
-              ) : (
-                <DummyAvatar
-                  className=" w-10 h-10 object-cover object-center rounded-full"
-                  alt="Dummy Image"
-                />
-              )}
-            </IconButton>
-          </Box>
-          <Box sx={{ display: { xs: "flex", md: "none" } }}>
-            <IconButton
-              size="large"
-              aria-label="show more"
-              aria-controls={mobileMenuId}
-              aria-haspopup="true"
-              onClick={handleMobileMenuOpen}
-              color="inherit"
-            >
-              <MoreIcon />
-            </IconButton>
-          </Box>
-        </Toolbar>
-      </AppBar>
-      {renderMobileMenu}
-      {renderMenu}
-    </Box>
+              Following
+            </button>
+          </div>
+        </nav>
+        <SearchOption
+          searchQuery={searchQuery}
+          setSearchQuery={setSearchQuery}
+        />
+      </div>
+    </div>
   );
 };
 
-export default PrimarySearchAppBar;
+export default Navbar;

@@ -1,54 +1,65 @@
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import axios from "axios";
-import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { Buffer } from "buffer";
-import Container from "@mui/material/Container";
-import Typography from "@mui/material/Typography";
-import Button from "@mui/material/Button";
-import Box from "@mui/material/Box";
 import Avatar from "@mui/material/Avatar";
-import MDEditor from "@uiw/react-md-editor";
 import FollowBtn from "./FollowBtn";
-import Navbar from "../Navbar";
+import "../userBlogs.css";
+import { LikeUnlikeComponent } from "./LikeUnlikeComponent";
+import DisplayComments from "../CommentComponents/DisplayComments";
 
 const SearchProfile = () => {
-  const [userData, setUserData] = useState();
+  const [userData, setUserData] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const offset = useRef(0);
+  const [hasMore, setHasMore] = useState(true);
+  const [count, setCount] = useState(0);
+  const limit = 5;
+  const observer = useRef(null);
+  const sentinelRef = useRef();
+  const navigate = useNavigate();
   const [userBlogs, setUserBlogs] = useState([]);
-  const { userId } = useParams("");
+  const { userId } = useParams();
   const apiBaseUrl = import.meta.env.VITE_API_URL;
 
-  console.log(userId);
-
-  const fetchUserData = () => {
+  const fetchUserData = useCallback(async () => {
     const path = `/profile/blog/${userId}`;
     const apiUrl = apiBaseUrl + path;
+    try {
+      const response = await axios.get(apiUrl, { withCredentials: true });
+      setUserData(response.data);
+      console.log("Fetched userData:", response.data);
+    } catch (error) {
+      console.error("Error fetching user data", error);
+    }
+  }, [userId, apiBaseUrl]);
 
-    axios
-      .get(apiUrl, {
-        withCredentials: true,
-      })
+  const fetchBlogData = useCallback(async () => {
+    if (loading || !hasMore) return;
 
-      .then((response) => {
-        setUserData(response.data);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  };
-  const fetchBlogData = () => {
-    const url = `http://localhost:3000/blog/${userId}/blogs`;
-    axios
-      .get(url, { withCredentials: true })
-      .then((response) => {
-        const sortedBlogs = response.data.sort(
-          (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-        );
-        setUserBlogs(sortedBlogs);
-      })
-      .catch((errr) => {
-        console.log(err);
-      });
-  };
+    setLoading(true);
+    console.log("Fetching blog data with offset", offset.current);
+
+    const path = `/blog/${userId}/blogs?offset=${offset.current}&limit=${limit}`;
+    const apiUrl = apiBaseUrl + path;
+
+    try {
+      const response = await axios.get(apiUrl, { withCredentials: true });
+      const { data: blogs, count: blogCount } = response.data;
+
+      setUserBlogs((prevBlogs) => [...prevBlogs, ...blogs]);
+      setCount(blogCount);
+      offset.current += limit;
+
+      if (blogs.length < limit) setHasMore(false);
+
+      console.log("Fetched blog data", blogs);
+    } catch (error) {
+      console.error("Error fetching blog data", error);
+    } finally {
+      setLoading(false);
+    }
+  }, [loading, hasMore, userId, apiBaseUrl, limit]);
 
   const formatDate = (timeStamp) => {
     const options = {
@@ -62,125 +73,115 @@ const SearchProfile = () => {
   };
 
   useEffect(() => {
+    console.log("userId changed:", userId);
+    setUserBlogs([]);
+    offset.current = 0;
+    setHasMore(true);
+    setUserData(null); // Clear user data on user change
     fetchUserData();
-    fetchBlogData();
-  }, []);
-  console.log(userBlogs);
-  return (
-    <div>
-      <Navbar />
-      <div className="my-10">
-        {userData && (
-          <>
-            <Container
-              component="main"
-              maxWidth="xs"
-              style={{
-                backgroundColor: "white",
-                border: "1px solid #ccc",
-                borderRadius: "5px",
-                padding: "20px",
-              }}
-            >
-              <div
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                  textAlign: "center",
-                  marginTop: "20px",
-                  marginBottom: "10px",
-                }}
-              >
-                <Avatar
-                  alt="User Avatar"
-                  sx={{ width: 120, height: 120, marginBottom: 2 }}
-                >
-                  {userData.profilePicture && (
-                    <img
-                      style={{
-                        width: "100%",
-                        height: "100%",
-                        objectFit: "cover",
-                      }}
-                      src={`data:${
-                        userData.profilePicture.contentType
-                      };base64,${Buffer.from(
-                        userData.profilePicture.data.data
-                      ).toString("base64")}`}
-                      alt={userData.title}
-                    />
-                  )}
-                </Avatar>
-                <Typography
-                  component="h1"
-                  variant="h5"
-                  gutterBottom
-                  style={{ fontSize: "24px" }}
-                >
-                  {userData.username}
-                </Typography>
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "center",
-                    margin: "15px",
-                    marginBottom: "25px",
-                    backgroundColor: "#f0f0f0",
-                    borderRadius: "10px",
-                    padding: "20px",
-                  }}
-                >
-                  <Typography
-                    component="p"
-                    variant="body1"
-                    style={{ fontSize: "16px", marginRight: "10px" }}
-                  >
-                    <strong>
-                      {userData.following ? userData.following.length : 0}
-                    </strong>{" "}
-                    <br />
-                    Following:
-                  </Typography>
+  }, [userId, fetchUserData]);
 
-                  <Typography
-                    component="p"
-                    variant="body1"
-                    style={{ fontSize: "16px", marginRight: "10px" }}
-                  >
-                    <strong>
-                      {userData.followers ? userData.followers.length : 0}
-                    </strong>{" "}
-                    <br />
-                    Followers:
-                  </Typography>
-                  <Typography
-                    component="p"
-                    variant="body1"
-                    style={{ fontSize: "16px" }}
-                  >
-                    <strong> 100 </strong>
-                    <br /> Posts:
-                  </Typography>
-                </div>
-                <FollowBtn userId={userId} />
-              </div>
-            </Container>
-          </>
-        )}
-      </div>
-      <div className="my-20">
+  useEffect(() => {
+    if (userData) {
+      fetchBlogData();
+    }
+  }, [userData]);
+
+  useEffect(() => {
+    if (observer.current) observer.current.disconnect();
+
+    observer.current = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting) {
+        console.log("Sentinel intersecting, fetching more data...");
+        fetchBlogData();
+      }
+    });
+
+    if (sentinelRef.current) {
+      observer.current.observe(sentinelRef.current);
+    }
+
+    return () => {
+      if (observer.current) observer.current.disconnect();
+    };
+  }, [fetchBlogData]);
+
+  return (
+    <div className="flex flex-col items-center w-full mt-5 md:ml-36 lg:ml-36 xl:ml-36 mr-10">
+      {userData && (
+        <div
+          className="bg-neutral-950 w-full max-w-3xl rounded-xl border-1 py-4 mb-5"
+          style={{ outline: "1px solid rgba(255, 255, 255, 0.1)" }}
+        >
+          <div className="flex flex-col items-center text-center mt-5 mb-5">
+            <Avatar
+              alt="User Avatar"
+              sx={{ width: 120, height: 120, marginBottom: 2 }}
+            >
+              {userData.profilePicture && (
+                <img
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "cover",
+                  }}
+                  src={`data:${
+                    userData.profilePicture.contentType
+                  };base64,${Buffer.from(userData.profilePicture.data).toString(
+                    "base64"
+                  )}`}
+                  alt={userData.username}
+                />
+              )}
+            </Avatar>
+            <h1 className="text-white text-3xl font-sans font-medium">
+              {userData.username}
+            </h1>
+            <div className="flex justify-center m-10 bg-white rounded-md p-8">
+              <h1 className="ml-10 mr-10">
+                <strong>
+                  {userData.following ? userData.following.length : 0}
+                </strong>
+                <br />
+                Following:
+              </h1>
+              <h1 className="mr-10">
+                <strong>
+                  {userData.followers ? userData.followers.length : 0}
+                </strong>
+                <br />
+                Followers:
+              </h1>
+              <h1 className="mr-10">
+                <strong>{count}</strong>
+                <br /> Posts:
+              </h1>
+            </div>
+            <div
+              className=" text-white px-4 py-2 rounded-xl transition duration-300 hover:scale-105 rounded-t-xl"
+              style={{ outline: "1px solid rgba(255, 255, 255, 0.1)" }}
+            >
+              <FollowBtn className="ml-10 mr-10" userId={userId} />
+            </div>
+          </div>
+        </div>
+      )}
+      <div className="w-full max-w-3xl my-4">
         {userBlogs.length === 0 ? (
-          <h1 className="text-3xl text-center font-bold ">No posts yet</h1>
+          <h1 className="text-3xl text-center font-bold">No posts yet</h1>
         ) : (
           <div>
             {userBlogs.map((blog, index) => (
-              <div className=" max-w-3xl mx-auto " key={index}>
-                <div className="bg-white rounded-sm overflow-hidden shadow-custom mb-20 hover:transform scale-105 transition-transform duration-300">
-                  {/*Always perfome the checks if to see if the item is present*/}
+              <div key={index}>
+                <div
+                  className="bg-white rounded-md overflow-hidden shadow-custom mb-1"
+                  onClick={() =>
+                    navigate(`/home/${blog.user}/blogs/${blog._id}`)
+                  }
+                >
                   {blog.image && blog.image.contentType && (
                     <img
-                      className=" w-full h-32 object-cover objct-center"
+                      className="w-full h-32 object-cover object-center"
                       src={`data:${blog.image.contentType};base64,${Buffer.from(
                         blog.image.data.data
                       ).toString("base64")}`}
@@ -188,23 +189,36 @@ const SearchProfile = () => {
                     />
                   )}
                   <div className="px-6 py-4">
-                    <h1 className="font-bold text-base sm:text-lg md:text-xl lg:text-2xl xl:text-3xl mb-2">
-                      {blog.title}
-                    </h1>
-                    <MDEditor.Markdown
-                      source={blog.content}
+                    <h1 className="font-bold text-xl mb-2">{blog.title}</h1>
+                    <p
+                      className="text-black text-base mb-5"
                       style={{ whiteSpace: "pre-wrap" }}
-                      className="text-black text-base sm:text-lg md:text-xl lg:text-2xl xl:text-3xl"
-                    />
-                    <p className="text-gray-600 md:text-lg">
-                      Created on:{formatDate(blog.createdAt)}
+                    >
+                      {blog.content}
                     </p>
+                    <p className="text-gray-600 text-base mb-5">
+                      Created on: {formatDate(blog.createdAt)}
+                    </p>
+                    <div className="flex gap-8 mb-4">
+                      <div onClick={(e) => e.stopPropagation()}>
+                        <LikeUnlikeComponent blogId={blog._id} />
+                      </div>
+                      <div>
+                        <DisplayComments blogId={blog._id} />
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
             ))}
           </div>
         )}
+      </div>
+      <div
+        ref={sentinelRef}
+        className="flex justify-center text-white w-full max-w-3xl h-10"
+      >
+        {loading && <p>Loading....</p>}
       </div>
     </div>
   );

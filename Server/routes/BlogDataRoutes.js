@@ -1,13 +1,16 @@
 import express, { response } from "express";
 import { FoodBlog } from "../models/FoodBlogModel.js";
 import multer from "multer";
-import { request } from "http";
-import { error } from "console";
+import { User } from "../models/UsersModel.js";
 import mongoose from "mongoose";
-import authRouter from "./LoginRoutes.js";
-import jwt from "jsonwebtoken";
-import dotenv from "dotenv";
+import authRouter from "../Controller/LoginRoutes.js";
 import decodedToken from "../middleware/DecodingMiddleware.js";
+import {
+  getPaginatedBlogs,
+  getPaginatedBlogsByOtherUser,
+  getPaginatedBlogsByUser,
+  getPaginatedFollowingBlogList,
+} from "../Controller/Pagination.js";
 
 //in order to use express router
 //import express, declare express router
@@ -33,6 +36,7 @@ router.use("/", authRouter);
 // router.use("/", upload.single("image")); //IMP STEP
 //router.use(upload.single("image"));
 
+//uplaoding new blog
 router.post("/uploads", upload.single("image"), async (request, response) => {
   try {
     if (!request.body.title && (!request.body.content || !request.body.image)) {
@@ -46,7 +50,7 @@ router.post("/uploads", upload.single("image"), async (request, response) => {
       content: request.body.content,
       user: userId,
     };
-    console.log(newBlog);
+    // console.log(newBlog);
     if (request.file) {
       newBlog.image = {
         name: request.file.originalname, //originalname gives the name of the image file to db
@@ -56,6 +60,9 @@ router.post("/uploads", upload.single("image"), async (request, response) => {
     }
 
     const Fblog = await FoodBlog.create(newBlog);
+
+    await User.findByIdAndUpdate(userId, { $inc: { blogCount: 1 } });
+
     return response.status(201).send(Fblog);
     //below is catch don't get confused dumbass.
   } catch (err) {
@@ -63,14 +70,20 @@ router.post("/uploads", upload.single("image"), async (request, response) => {
     response.status(500).send(err);
   }
 });
+//it displays all the blogs
 router.get("/", decodedToken, async (request, response) => {
   try {
-    const Fblog = await FoodBlog.find({
-      isDeleted: false,
-    });
+    const offset = parseInt(request.query.offset) || 0;
+    const limit = parseInt(request.query.limit) || 5;
+
+    const loggedInUserId = request.userId;
+
+    // Get paginated blogs with filtering based on blocked users
+    const blogs = await getPaginatedBlogs(offset, limit, loggedInUserId);
+
     return response.status(200).json({
-      count: FoodBlog.length,
-      data: Fblog,
+      count: blogs.length, // Assuming you want to return the count of filtered blogs
+      data: blogs,
     });
   } catch (err) {
     console.log(err);
@@ -78,12 +91,42 @@ router.get("/", decodedToken, async (request, response) => {
   }
 });
 
-//to display the profile pic of user with name
+//to fetch list of blogs the user follow
+//the array is fetched from the body
 
-//to fetch data from single user
+router.get("/following/:userId/userlist", async (request, response) => {
+  try {
+    const userId = request.userId;
+
+    const userList = await User.findById(userId).populate("following");
+    const followedUserIds = userList.following.map((user) => user._id);
+
+    const offset = parseInt(request.query.offset) || 0;
+    const limit = parseInt(request.query.limit) || 4;
+
+    const { blogs, count } = await getPaginatedFollowingBlogList(
+      followedUserIds,
+      offset,
+      limit
+    );
+    // console.log("blog", blogs);
+    return response.status(200).json({ count, data: blogs });
+  } catch (error) {
+    console.log(error);
+    response.status(500).send(error);
+  }
+});
+
+//to display the profile pic of user with name
+//to fetch data from single user who logged in
 router.get("/user/:userId/blogs", async (request, response) => {
   try {
     const userId = request.userId;
+    const offset = parseInt(request.query.offset) || 0;
+    const limit = parseInt(request.query.limit) || 5;
+
+    // console.log("offset", request.query.offset);
+    // console.log("limit", request.query.limit);
 
     // console.log("Type of userId:", userId);
 
@@ -91,29 +134,31 @@ router.get("/user/:userId/blogs", async (request, response) => {
       console.error("invalid object id format");
       return response.status(400).json({ message: "invalid id format" });
     }
+
     //find and findOne can cause issue when mapping
     //find sends an array findbyId sends object
-    const Fblog = await FoodBlog.find({
-      user: userId,
-      isDeleted: false,
+    const { blogs, count } = await getPaginatedBlogsByUser(
+      userId,
+      offset,
+      limit
+    );
+    return response.status(200).json({
+      count,
+      data: blogs,
     });
-
-    if (!Fblog) {
-      console.log("blog not found");
-      return response.status(404).json({ message: "BlogNotFound" });
-    }
-    return response.status(200).json(Fblog);
   } catch (err) {
     console.log(err);
     response.status(500).send(err);
   }
 });
 
+//to get the blogs of other users not used anywhere
 router.get("/:userId/blogs", async (request, response) => {
   try {
     const userId = request.params.userId;
-
-    console.log("Type of userId:", userId);
+    const offset = parseInt(request.query.offset) || 0;
+    const limit = parseInt(request.query.limit) || 5;
+    
 
     if (!mongoose.Types.ObjectId.isValid(userId)) {
       console.error("invalid object id format");
@@ -121,16 +166,51 @@ router.get("/:userId/blogs", async (request, response) => {
     }
     //find and findOne can cause issue when mapping
     //find sends an array findbyId sends object
-    const Fblog = await FoodBlog.find({
+    const { UserDetails, blogs, count } = await getPaginatedBlogsByOtherUser(
+      userId,
+      offset,
+      limit
+    );
+
+    if (!blogs) {
+      console.log("blog not found");
+      return response.status(404).json({ message: "BlogNotFound" });
+    }
+
+    return response
+      .status(200)
+      .json({ count, data: blogs, userData: UserDetails });
+  } catch (err) {
+    console.log(err);
+    response.status(500).send(err);
+  }
+});
+
+//Route to get one blog of  of others users
+router.get("/otherUser/:userId/blogs/:blogId", async (request, response) => {
+  try {
+    const { userId } = request.params;
+
+    const { blogId } = request.params;
+    // console.log("userID", userId), console.log("blogID", blogId);
+
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+      console.error("invalid object id format");
+      return response.status(400).json({ message: "invalid id format" });
+    }
+
+    const data = await FoodBlog.findOne({
+      _id: blogId,
       user: userId,
       isDeleted: false,
     });
 
-    if (!Fblog) {
+    // console.log("data", data);
+    if (!data) {
       console.log("blog not found");
       return response.status(404).json({ message: "BlogNotFound" });
     }
-    return response.status(200).json(Fblog);
+    return response.status(200).json({ data });
   } catch (err) {
     console.log(err);
     response.status(500).send(err);
@@ -146,14 +226,14 @@ router.put(
       const userId = request.userId;
       const { blogId } = request.params;
 
-      console.log(userId);
-      console.log(blogId);
+      // console.log(userId);
+      // console.log(blogId);
 
       const updatedData = {
         title: request.body.title,
         content: request.body.content,
       };
-      console.log(updatedData);
+      // console.log(updatedData);
       if (request.file) {
         updatedData.image = {
           name: request.file.originalname, //originalname gives the name of the image file to db
@@ -170,7 +250,7 @@ router.put(
       if (!updatedBlog) {
         return response.status(404).json({ message: "blog not updated" });
       }
-      console.log(updatedBlog);
+   
       return response.status(200).json(updatedBlog);
     } catch (err) {
       console.log(error.message);
@@ -183,6 +263,7 @@ router.put(
 router.get("/user/:userId/blogs/:blogId", async (request, response) => {
   try {
     const userId = request.userId;
+    // console.log("this is the suer id that i called", userId);
     const { blogId } = request.params;
 
     if (!mongoose.Types.ObjectId.isValid(userId)) {
@@ -190,13 +271,13 @@ router.get("/user/:userId/blogs/:blogId", async (request, response) => {
       return response.status(400).json({ message: "invalid id format" });
     }
 
-    const data = await FoodBlog.find({
+    const data = await FoodBlog.findOne({
       _id: blogId,
       user: userId,
       isDeleted: false,
     });
 
-    console.log(data);
+    // console.log(data);
 
     if (!data) {
       console.log("blog not found");
@@ -213,7 +294,7 @@ router.get("/user/:userId/blogs/:blogId", async (request, response) => {
 
 router.delete("/user/:userId/blogs/:blogId", async (request, response) => {
   try {
-    const { userId } = request.userId;
+    const userId = request.userId;
     const { blogId } = request.params;
 
     const filter = { _id: blogId };
@@ -225,6 +306,7 @@ router.delete("/user/:userId/blogs/:blogId", async (request, response) => {
         .status(404)
         .json({ message: "Blog not found or already deleted" });
     }
+    await User.findByIdAndUpdate(userId, { $inc: { blogCount: -1 } });
     return response.status(200).json({ message: "Blog deleted successfully" });
   } catch (err) {
     console.log(err.message);
@@ -232,8 +314,77 @@ router.delete("/user/:userId/blogs/:blogId", async (request, response) => {
   }
 });
 
-//Route to like a blog
+//Route to display the blogs
+router.get(
+  "/user/blogs/:blogId/viewCount",
+  decodedToken,
+  async (request, response) => {
+    try {
+      const { blogId } = request.params;
 
+
+      if (!mongoose.Types.ObjectId.isValid(blogId)) {
+        return response.status(400).json({ message: "invalid id format" });
+      }
+
+      const blog = await FoodBlog.findById(blogId);
+      if (!blog) {
+        return response.status(404).json({ message: "Blog not found" });
+      }
+
+      return response.status(200).json(blog.views.length);
+    } catch (error) {
+      return response.status(500).json({ message: "internal server error" });
+    }
+  }
+);
+
+//Route to post displayVies for blog
+router.post(
+  "/user/:userId/blogs/:blogId/views",
+  decodedToken,
+  async (request, response) => {
+    console.log("post request received");
+    try {
+      const userId = request.userId;
+      const { blogId } = request.params;
+      // console.log("this is the user id", userId);
+      // console.log("this is the blog id", blogId);
+
+      if (!mongoose.Types.ObjectId.isValid(userId)) {
+        console.log("invalid object id format");
+        return response.status(400).json({ message: "invalid id format" });
+      }
+      if (!mongoose.Types.ObjectId.isValid(blogId)) {
+        return response.status(400).json({ message: "invalid id format" });
+      }
+      const blog = await FoodBlog.findById(blogId);
+      if (!blog) {
+        return response.status(404).json({ message: "Blog not found" });
+      }
+      const now = new Date();
+      const oneDayAgo = new Date(now - 24 * 60 * 60 * 1000);
+
+      const existingView = blog.views.find(
+        (view) =>
+          view.userId.toString() === userId && view.timestamp > oneDayAgo
+      );
+      // console.log(existingView);
+
+      if (!existingView) {
+        blog.views.push({ userId, timestamp: now });
+        await blog.save();
+      }
+
+      return response.status(200).json({ message: "view recorded" });
+    } catch (error) {
+      console.log("Error:", error.message);
+      response.status(500).json({ message: error.message });
+    }
+  }
+);
+
+//Route to like a blog
 router.put(
   "/user/:userId/blogs/:blogId/like",
   decodedToken,
@@ -293,7 +444,6 @@ router.put(
 );
 
 //Route to display the like
-
 router.get(
   "/user/:userId/blogs/:blogId/like",
   decodedToken,
@@ -327,14 +477,13 @@ router.get(
 
 //to add new comments
 router.post(
-  "/user/:userId/blogs/:blogId/comments",
+  "/user/:userId/blogs/:blogId/postcomments",
   decodedToken,
   async (request, response) => {
     try {
       const userId = request.userId;
       const { blogId } = request.params;
       const { commentText } = request.body;
-      console.log(commentText);
       // Validate blogId
       if (!mongoose.Types.ObjectId.isValid(blogId)) {
         return response.status(400).json({ message: "Invalid blogId" });
@@ -364,29 +513,123 @@ router.post(
   }
 );
 
-// Route to get comments for a specific blog post
+// // Route to get comments for a specific blog post
+// router.get(
+//   "/user/:userId/blogs/:blogId/comments/",
+//   decodedToken,
+//   async (request, response) => {
+//     try {
+//       const { blogId } = request.params;
+//       const userId = request.userId;
+//       // Validate blogId
+//       if (!mongoose.Types.ObjectId.isValid(blogId)) {
+//         return response.status(400).json({ message: "Invalid blogId" });
+//       }
+
+//       // Retrieve the blog post
+//       const filter = { _id: blogId };
+//       const blog = await FoodBlog.find(filter);
+
+//       if (!blog) {
+//         return response.status(404).json({ message: "Blog not found" });
+//       }
+
+//       // Return the comments for the blog post
+//       //adding the { data:blog }
+//       return response.status(200).json({ data: blog });
+//     } catch (err) {
+//       console.error(err.message);
+//       response.status(500).json({ message: "Internal server error" });
+//     }
+//   }
+// );
+
 router.get(
-  "/user/:userId/blogs/:blogId/comments/",
+  "/user/blogs/:blogId/comments/",
   decodedToken,
   async (request, response) => {
     try {
       const { blogId } = request.params;
-      const userId = request.userId;
+
       // Validate blogId
       if (!mongoose.Types.ObjectId.isValid(blogId)) {
         return response.status(400).json({ message: "Invalid blogId" });
       }
 
-      // Retrieve the blog post
-      const filter = { _id: blogId };
-      const blog = await FoodBlog.find(filter);
+      // Aggregate to join comments with user information and include blog owner
+      const blog = await FoodBlog.aggregate([
+        { $match: { _id: new mongoose.Types.ObjectId(blogId) } },
+        {
+          $lookup: {
+            from: "users", // Assuming your user model collection is named 'users'
+            localField: "user", // Field in the blog document that references the user
+            foreignField: "_id", // Field in the users collection that is the user ID
+            as: "blogOwner",
+          },
+        },
+        { $unwind: "$blogOwner" },
+        {
+          $lookup: {
+            from: "users", // Assuming your user model collection is named 'users'
+            localField: "comments.user", // Field in the comments array that references the user
+            foreignField: "_id", // Field in the users collection that is the user ID
+            as: "commentUser",
+          },
+        },
+        {
+          $addFields: {
+            comments: {
+              $map: {
+                input: "$comments",
+                as: "comment",
+                in: {
+                  _id: "$$comment._id",
+                  content: "$$comment.content",
+                  user: {
+                    $arrayElemAt: [
+                      {
+                        $filter: {
+                          input: "$commentUser",
+                          as: "user",
+                          cond: { $eq: ["$$user._id", "$$comment.user"] },
+                        },
+                      },
+                      0,
+                    ],
+                  },
+                },
+              },
+            },
+          },
+        },
+        {
+          $project: {
+            _id: 1,
+            title: 1,
+            content: 1,
+            user: {
+              _id: "$blogOwner._id",
+              name: "$blogOwner.name",
+              profilePicture: "$blogOwner.profilePicture",
+            },
+            comments: {
+              _id: 1,
+              content: 1,
+              user: {
+                _id: 1,
+                name: 1,
+                profilePicture: 1,
+              },
+            },
+          },
+        },
+      ]);
 
-      if (!blog) {
+      if (blog.length === 0) {
         return response.status(404).json({ message: "Blog not found" });
       }
 
-      // Return the comments for the blog post
-      //adding the { data:blog }
+      // Return the blog with comments and user data
       return response.status(200).json({ data: blog });
     } catch (err) {
       console.error(err.message);

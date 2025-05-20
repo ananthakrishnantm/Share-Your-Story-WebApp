@@ -7,9 +7,8 @@ import ChangePasswordModal from "./ChangePassword";
 
 const ViewProfileLogic = () => {
   const [data, setData] = useState({});
-  const [firstName, setFirstName] = useState("");
-  const [middleName, setMiddleName] = useState("");
-  const [lastName, setLastName] = useState("");
+  const [Name, setName] = useState("");
+  const[username,setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [profilePic, setProfilePic] = useState(null);
   const [reload, setReload] = useState(false);
@@ -42,9 +41,8 @@ const ViewProfileLogic = () => {
       .get(apiUrl, { withCredentials: true })
       .then((response) => {
         setData(response.data.data);
-        setFirstName(response.data.data.firstName);
-        setMiddleName(response.data.data.middleName);
-        setLastName(response.data.data.lastName);
+        setName(response.data.data.Name);
+        setUsername(response.data.data.username);
         setEmail(response.data.data.email);
         setProfilePic(response.data.profilePicture);
       })
@@ -80,6 +78,8 @@ const ViewProfileLogic = () => {
       });
   };
 
+  
+
   const handleEdit = () => {
     setEditMode(true);
   };
@@ -89,9 +89,9 @@ const ViewProfileLogic = () => {
     const apiUrl = apiBaseUrl + path;
 
     const formData = new FormData();
-    formData.append("firstName", firstName);
-    formData.append("middleName", middleName);
-    formData.append("lastName", lastName);
+    formData.append("Name", Name);
+    formData.append("username", username);
+    
     formData.append("email", email);
 
     // Update the profile on the server
@@ -111,37 +111,38 @@ const ViewProfileLogic = () => {
 
   return (
     <>
-      <div className="flex items-center justify-center h-full mt-10">
+      <div className="flex items-center justify-center h-full mt-10 ">
+        <div style={{marginTop:"10%"}}>
         <div className="max-w-xl w-full bg-white p-8 rounded-lg shadow-md">
           <div>
             {editMode ? (
               <div className="mb-10">
                 <form onSubmit={handleSave}>
                   <div>
-                    <label>FirstName : </label>
+                    <label>Name : </label>
                     <input
                       type="text"
                       name="firstName"
-                      value={firstName}
+                      value={Name}
                       className="border border-gray-300 rounded-md py-2 px-4 w-full text-lg"
-                      onChange={(e) => setFirstName(e.target.value)}
+                      onChange={(e) => setName(e.target.value)}
                       placeholder="Enter your first name"
                     />
                   </div>
                   <br />
                   <div>
-                    <label>MiddleName : </label>
+                    <label>Username : </label>
                     <input
                       type="text"
                       name="middleName"
-                      value={middleName}
+                      value={username}
                       className="border border-gray-300 rounded-md py-2 px-4 w-full text-lg"
-                      onChange={(e) => setMiddleName(e.target.value)}
+                      onChange={(e) => (e.target.value)}
                       placeholder="Enter your middle name"
                     />
                   </div>
                   <br />
-                  <div className="mb-5">
+                  {/* <div className="mb-5">
                     <label>LastName : </label>
                     <input
                       type="text"
@@ -152,7 +153,7 @@ const ViewProfileLogic = () => {
                       placeholder="Enter your last name"
                     />
                     <br />
-                  </div>
+                  </div> */}
                   <div>
                     <label>Email Id : </label>
                     <input
@@ -172,15 +173,15 @@ const ViewProfileLogic = () => {
                 <div className="flex">
                   <div className="flex-grow">
                     <div>
-                      <label>FirstName : </label>
-                      <p className="text-xl">{firstName}</p>
+                      <label>Name : </label>
+                      <p className="text-xl">{Name}</p>
                       <br />
-                      <label>MiddleName: </label>
-                      <p className="text-xl">{middleName}</p>
+                      <label>Username: </label>
+                      <p className="text-xl">{username}</p>
                       <br />
-                      <label>LastName: </label>
+                      {/* <label>LastName: </label>
                       <p className="text-xl">{lastName}</p>
-                      <br />
+                      <br /> */}
                       <label>Email Id: </label>
                       <p className="text-xl">{email}</p>
                       <br />
@@ -283,6 +284,7 @@ const ViewProfileLogic = () => {
             {isModalOpen && <ChangePasswordModal closeModal={closeModal} />}
           </div>
         </div>
+      </div>
       </div>
     </>
   );

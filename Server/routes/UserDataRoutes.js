@@ -1,12 +1,12 @@
 import express, { request, response } from "express";
 import multer from "multer";
 import mongoose from "mongoose";
-import authRouter from "./LoginRoutes.js";
+import authRouter from "../Controller/LoginRoutes.js";
 import { User } from "../models/UsersModel.js";
 import decodedToken from "../middleware/DecodingMiddleware.js";
 import dotenv from "dotenv";
 import bcrypt from "bcrypt";
-import { FoodBlog } from "../models/FoodBlogModel.js";
+import { getPaginatedBlogsByUser } from "../Controller/Pagination.js";
 
 dotenv.config();
 const secretKey = process.env.JWT_SECRET_KEY;
@@ -16,6 +16,7 @@ const user = express.Router();
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 
+//decoded token protects the path
 user.use("/", decodedToken);
 user.use("/", authRouter);
 
@@ -83,11 +84,11 @@ user.get("/data/:userId", decodedToken, async (request, response) => {
   }
 });
 
-//to display the profile pic of user with name
+//to display the profile pic of any user with name
 user.get("/blog/:user", async (request, response) => {
   try {
     const userId = request.params.user; // Access userIds from request params
-    console.log(userId);
+    // console.log("this is userid", userId);
     const userData = await User.findById(userId)
       .select("-password")
       .select("-role"); // Use find() with $in operator to retrieve multiple users
@@ -95,7 +96,7 @@ user.get("/blog/:user", async (request, response) => {
     if (!userData) {
       return response.status(404).json({ message: "Users not found" });
     }
-    // console.log(userData);
+    // console.log("this is the userdata", userData);
     return response.status(200).json(userData);
   } catch (error) {
     console.log(error);
@@ -117,15 +118,10 @@ user.put(
       const UserDataToUpdate = {};
 
       // Check if request body contains fields to update
-      if (request.body.firstName) {
-        UserDataToUpdate.firstName = request.body.firstName;
+      if (request.body.Name) {
+        UserDataToUpdate.Name = request.body.Name;
       }
-      if (request.body.middleName) {
-        UserDataToUpdate.middleName = request.body.middleName;
-      }
-      if (request.body.lastName) {
-        UserDataToUpdate.lastName = request.body.lastName;
-      }
+
       if (request.body.email) {
         UserDataToUpdate.email = request.body.email;
       }
@@ -165,31 +161,168 @@ user.put(
 );
 
 //to fetch data from other user
-
 user.get("/users/:userId/blogs", async (request, response) => {
   try {
     const userId = request.params.userId;
 
-    console.log("Type of userId:", userId);
+    const offset = parseInt(request.query.offset) || 0;
+    const limit = parseInt(request.query.limit) || 5;
+
+    // console.log("offset", request.query.offset);
+    // console.log("limit", request.query.limit);
+    // console.log("NewuserId", userId);
 
     if (!mongoose.Types.ObjectId.isValid(userId)) {
       console.error("invalid object id format");
       return response.status(400).json({ message: "invalid id format" });
     }
     //find and findOne can caus issue when mapping
-    const Fblog = await FoodBlog.find({
-      user: userId,
-      isDeleted: false,
-    });
 
-    if (!Fblog) {
-      console.log("blog not found");
-      return response.status(404).json({ message: "BlogNotFound" });
-    }
-    return response.status(200).json(Fblog);
+    const { blogs, count } = await getPaginatedBlogsByUser(
+      userId,
+      offset,
+      limit
+    );
+    // const Fblog = await FoodBlog.find({
+    //   user: userId,
+    //   isDeleted: false,
+    // });
+
+    // if (!Fblog) {
+    //   console.log("blog not found");
+    //   return response.status(404).json({ message: "BlogNotFound" });
+    // }
+
+    // console.log("data list", blogs);
+    return response.status(200).json({
+      count,
+      data: blogs,
+    });
   } catch (err) {
     console.log(err);
     response.status(500).send(err);
+  }
+});
+
+user.post("/block/:userId", async (request, response) => {
+  try {
+    const { userId } = request.params;
+    const loggedInUserId = request.userId;
+
+    const user = await User.findById(loggedInUserId);
+    const userToBlock = await User.findById(userId);
+
+    if (user.blockedUsers.includes(userId)) {
+      return response.status(400).json({ message: "User already blocked" });
+    }
+
+    user.blockedUsers.push(userId);
+    userToBlock.blockedBy.push(loggedInUserId);
+
+    // Remove the user from following and followers arrays
+    user.following = user.following.filter((id) => id.toString() !== userId);
+    userToBlock.followers = userToBlock.followers.filter(
+      (id) => id.toString() !== loggedInUserId
+    );
+
+    await user.save();
+    await userToBlock.save();
+
+    response.status(200).json({ message: "User blocked successfully" });
+  } catch (error) {
+    console.error(error);
+    response.status(500).json({ message: "Internal server error" });
+  }
+});
+
+user.delete("/unblock/:userId", async (request, response) => {
+  try {
+    const { userId } = request.params;
+    const loggedInUserId = request.userId;
+
+    const user = await User.findById(loggedInUserId);
+    const userToUnblock = await User.findById(userId);
+
+    // Remove the userId from the logged-in user's blockedUsers array
+    user.blockedUsers = user.blockedUsers.filter(
+      (blockedUserId) => blockedUserId.toString() !== userId.toString()
+    );
+
+    // Remove the logged-in userId from the userToUnblock's blockedBy array
+    userToUnblock.blockedBy = userToUnblock.blockedBy.filter(
+      (blockedUserId) => blockedUserId.toString() !== loggedInUserId.toString()
+    );
+
+    await user.save();
+    await userToUnblock.save();
+
+    response.status(200).json({ message: "User unblocked successfully" });
+  } catch (error) {
+    console.error(error);
+    response.status(500).json({ message: "Internal server error" });
+  }
+});
+
+user.get("/blockedlist", decodedToken, async (request, response) => {
+  try {
+    const loggedInUserId = request.userId;
+
+    const userList = await User.findById(loggedInUserId).populate(
+      "blockedUsers",
+      "username"
+    );
+
+    response.status(200).json({ blockedUsers: userList.blockedUsers });
+  } catch (error) {
+    console.error(error);
+    response.status(500).json({ message: "Internal server error" });
+  }
+});
+
+user.put("/banned/:userId", async (request, response) => {
+  const { userId } = request.params;
+  console.log("this is hte banned userId", userId);
+  try {
+    const user = await User.findById(userId);
+    if (!user) {
+      return response.status(404).json({ message: "User not found" });
+    }
+    user.isBanned = true;
+    await user.save();
+    response.status(200).json({ message: "User banned successfully" });
+  } catch (error) {
+    console.log("this is the error", error);
+    response.status(500).json("internal server error");
+  }
+});
+
+user.put("/unban/:userId", async (request, response) => {
+  const { userId } = request.params;
+  console.log("this is hte banned userId", userId);
+  try {
+    const user = await User.findById(userId);
+    if (!user) {
+      return response.status(404).json({ message: "User not found" });
+    }
+    user.isBanned = false;
+    await user.save();
+    response.status(200).json({ message: "User unbanned successfully" });
+  } catch (error) {
+    response.status(500).json("internal server error");
+  }
+});
+
+user.get("/users/banned", async (request, response) => {
+  try {
+    const bannedUserList = await User.find({ isBanned: true })
+      .select("-password")
+      .select("-role");
+    console.log(bannedUserList);
+
+    response.status(200).json({ data: bannedUserList });
+  } catch (error) {
+    console.error("Error fetching banned users:", error);
+    response.status(500).json({ error: "Internal server error" });
   }
 });
 

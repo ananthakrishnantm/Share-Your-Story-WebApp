@@ -1,3 +1,11 @@
 body {
-  background-color: rgb(245, 245, 245);
+  background-color: rgb(24, 24, 24);
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden; /* Hide horizontal scrollbar */
+}
+
+.wrapper {
+  background-color: rgb(24, 24, 24); /* Same as body background */
+  min-height: 100vh; /* Ensure the wrapper takes at least the full height of the viewport */
 }

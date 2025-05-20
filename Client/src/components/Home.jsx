@@ -1,16 +1,15 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Upload from "./Upload";
 import AllUserBlogs from "./AllUserBlogs";
 import Navbar from "./Navbar";
-import SideBar from "./SideBar/SideBar";
-import FollowBar from "./SideBar/FollowBar";
-import ViewProfileLogic from "./UserComponents/ViewProfileLogic";
-import ViewProfileSecondary from "./UserComponents/ViewProfileSecondary";
-import FollowingList from "./SideBar/FollowingList";
-import SearchOption from "./SideBar/SearchOption";
+import SidePanel from "./UserComponents/SidePanel";
+import RightSidePanel from "./UserComponents/RightSidePanel";
+import BottomNavBar from "./BottomNavBar";
+import FollowingList from "../components/SideBar/FollowingList";
 
 function Home() {
   const [triggerFetch, setTriggerFetch] = useState(false);
+  const [showMenu, setShowMenu] = useState(false); // Assuming this is used for menu visibility
 
   const updateBlogList = () => {
     setTriggerFetch(!triggerFetch);
@@ -18,25 +17,30 @@ function Home() {
 
   return (
     <div>
-      <Navbar />
-      <div className="flex justify-center mt-10 m-20">
-        <div>
-          <ViewProfileSecondary />
-          <div className="mt-5  ">{/* <FollowBar /> */}</div>
+      <div className="flex justify-center">
+        <div className="hidden sm:hidden md:block">
+          <SidePanel />
         </div>
-        <div className="flex-1">
+        <div className="flex-1 ml-2 mr-2 mt-28 sm:mt-46 md:mt-28 lg:mt-24 sm:ml-5 sm:mr-5 md:ml-64 lg:mr-64">
           <Upload updateBlogList={updateBlogList} />
           <AllUserBlogs triggerFetch={triggerFetch} />
         </div>
-        <div className="flex flex-col ">
-          <div>
-            <SideBar />
-          </div>
-          <div className="mt-5">
-            <FollowingList />
+        <div className="hidden md:hidden lg:block">
+          <RightSidePanel />
+        </div>
+        {/* <div className="mt-52 hidden md:hidden lg:block">
+          <FollowingList />
+        </div> */}
+        <div className="flex flex-col">
+          <div className="mt-10" style={{ marginTop: "20%" }}>
+            {/* <FollowingList /> */}
           </div>
         </div>
       </div>
+      <Navbar />
+      <span className="md:hidden">
+        <BottomNavBar />
+      </span>
     </div>
   );
 }

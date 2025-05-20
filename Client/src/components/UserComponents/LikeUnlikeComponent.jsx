@@ -56,10 +56,14 @@ export const LikeUnlikeComponent = ({ blogId }) => {
     <div>
       {displaylike &&
         displaylike.map((data, index) => (
-          <button onClick={() => toggleLikeUnlike(data.action)} key={index}>
-            <FavoriteIcon />
-            {data.likesCount || 0}
-          </button>
+          <div key={index} className="flex gap-2">
+            <div>
+              <button onClick={() => toggleLikeUnlike(data.action)}>
+                <FavoriteIcon />
+              </button>
+            </div>
+            <div>{data.likesCount || 0}</div>
+          </div>
         ))}
     </div>
   );
