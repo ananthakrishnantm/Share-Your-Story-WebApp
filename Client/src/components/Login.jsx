@@ -64,9 +64,12 @@ const Login = () => {
     if (passwordError) setPasswordError("");
   };
 
+  const path = "/login/google";
+  const mainUrl = apiBaseUrl + path;
+
   //google login
   const handleGoogleLogin = () => {
-    window.location.href = "http://localhost:10000/api/login/google";
+    window.location.href = mainUrl;
   };
 
   return (
