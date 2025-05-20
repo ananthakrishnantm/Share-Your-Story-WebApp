@@ -11,6 +11,11 @@ dotenv.config();
 
 const googleClientID = process.env.GOOGLE_CLIENT_ID;
 const googleClientSecret = process.env.GOOGLE_CLIENT_SECRET;
+const callbackDomain = process.env.origin_Link;
+
+const base_url = "/api/login/google/callback";
+
+const fullapiLink = callbackDomain + base_url;
 
 const passportConfig = () => {
   passport.use(
@@ -18,7 +23,7 @@ const passportConfig = () => {
       {
         clientID: googleClientID,
         clientSecret: googleClientSecret,
-        callbackURL: "http://localhost:10000/api/login/google/callback",
+        callbackURL: fullapiLink,
       },
       async (accessToken, refreshToken, profile, done) => {
         try {
