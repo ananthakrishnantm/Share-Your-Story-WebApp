@@ -77,7 +77,7 @@ authRouter.get(
 
       const user = req.user;
       //test this later
-      if (!user.isBanned) {
+      if (user.isBanned) {
         return res.status(403).json({ message: "User is banned" });
       }
 
