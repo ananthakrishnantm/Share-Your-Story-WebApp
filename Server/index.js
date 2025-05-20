@@ -14,7 +14,7 @@ import followerRoute from "./routes/FollowersData.js";
 import { Server } from "socket.io"; // Import Server from the socket.io package
 // import { dirname, join } from "path";
 import { fileURLToPath } from "url";
-// import path from "path";
+import path from "path";
 import emailVerifyRouter from "./routes/VerifyEmail.js";
 import passport from "passport";
 import session from "express-session";
