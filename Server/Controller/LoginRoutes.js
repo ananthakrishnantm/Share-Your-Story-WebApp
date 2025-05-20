@@ -1,4 +1,3 @@
-import express, { response } from "express";
 import { User } from "../models/UsersModel.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
@@ -78,7 +77,7 @@ authRouter.get(
       const user = req.user;
       //test this later
       if (!user.isBanned) {
-        return response.status(403).json({ message: "User is banned" });
+        return res.status(403).json({ message: "User is banned" });
       }
 
       const token = jwt.sign({ userId: user._id, role: user.role }, secretKey);
