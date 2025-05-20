@@ -68,7 +68,7 @@ authRouter.get(
 
 // Google callback
 authRouter.get(
-  "/google/callback",
+  `${successRedirectLink}/google/callback`,
   passport.authenticate("google", { failureRedirect: "/login" }),
 
   async (req, res) => {
